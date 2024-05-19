@@ -1,10 +1,13 @@
-%token ENDL
-%token OBJECT_NAME, STR_ARG, SPECIAL, AUTOMATIC
-%token FILE_NAME, PATH
+%token OBJECT_NAME, STR_ARG, SPECIAL, AUTOMATIC, FILE_NAME, PATH
 
 %token IFEQ, IFNEQ, ELSE, ENDIF, IFDEF, IFNDEF, ENDEF
 
 %token INCLUDE
+%token DEFINE
+
+%token SHELL
+
+%token ENDL
 
 %token EMPTY
 
@@ -22,14 +25,6 @@ line:
             define
             |
             condition
-            ;
-
-define:
-            EMPTY
-            ;
-
-condition:
-            EMPTY
             ;
 
 // --------------------- VARIABLES -----------------------
@@ -89,6 +84,30 @@ prerequisite:
             PATH
             ;
 // -------------------------------------------------------
+define:
+            DEFINE OBJECT_NAME ENDL
+            define_body 
+            ENDEF ENDL
+            ;
+
+define_body:
+            // ...
+            SHELL
+            |
+            variableValue
+            |
+            OBJECT_NAME
+            |
+            AUTOMATIC
+            |
+            FILE_NAME
+            |
+            PATH
+            |
+            STR_ARG
+            |
+            ENDL
+            ;
 
 // -------------------- CONDITIONS -----------------------
 condition:
@@ -126,7 +145,6 @@ arg:
             |
             STR_ARG
             ;
-
 // -------------------------------------------------------
 
 // ---------------------- INCLUDE ------------------------
@@ -145,11 +163,11 @@ filenames:
             ;
 // -------------------------------------------------------
 
+// --------------------- RECIPIES ------------------------
 recipies: 
             EMPTY
             ;
-
-//
+// -------------------------------------------------------
 
 atomic:
             variableValue
