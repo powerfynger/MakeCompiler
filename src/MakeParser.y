@@ -1,21 +1,28 @@
+%{
+#include <stdio.h>
+#include <stdlib.h>
+
+int yyparse();
+extern int yylex();
+extern FILE* yyin;
+
+%}
+
 %token OBJECT_NAME, STR_ARG, SPECIAL_MODIFICATOR, AUTOMATIC, FILE_NAME, PATH
-
 %token IFEQ, IFNEQ, ELSE, ENDIF, IFDEF, IFNDEF, ENDEF
-
-%token INCLUDE
-%token DEFINE
-
+%token INCLUDE, EXPORT, DEFINE
 %token ASSIGNMENT
-
 %token SHELL
-
 %token ENDL
-
 %token EMPTY
+
+%start in
 
 %%
 
-input: | input line
+in: 
+            | in line
+            ;
 
 line: 
             ENDL
@@ -27,14 +34,39 @@ line:
             define
             |
             condition
+            |
+            variable
             ;
 
 // --------------------- VARIABLES -----------------------
 variable: 
-            variableName
+            variableName ASSIGNMENT variableBody ENDL
+            |
+            EXPORT variable
+            |
+            EXPORT OBJECT_NAME ENDL
+            |
+            EXPORT ENDL
+
             ;
 
 variableName:
+            OBJECT_NAME
+            |
+            FILE_NAME {
+                /* ERROR: Filename in variable name */
+            }
+            |
+            PATH {
+                /* ERROR: Path in variable name */
+            }
+            |
+            AUTOMATIC {
+                /* ERROR: Automatic variable in target */
+            }
+            ;
+
+variableBody:
             EMPTY
             ;
 
@@ -53,9 +85,9 @@ target:
             ;
 
 targetVar: 
-            targetName ':'
+            targetExpr ':'
             |
-            targetName ':' ':'
+            targetExpr ':' ':'
             |
             // TODO
             // Остальные виды символов между модификатором и его значением
@@ -68,6 +100,13 @@ targetVar:
             SPECIAL_MODIFICATOR '='
             ;
 
+            // Для учета "фейк" (пустых) целей
+targetExpr:
+            targetExpr targetName
+            |
+            targetName
+            ;
+
 targetName: 
             variableName
             |
@@ -76,15 +115,26 @@ targetName:
             FILE_NAME
             |
             PATH
-            ;            
+            |
+            AUTOMATIC {
+                /* ERROR: Automatic variable in target */
+            }
+            ;
 // -------------------------------------------------------
 
 // ------------------- PREREQUISITE ----------------------
-prerequisites:
-            prerequisite
+prerequisite:
+            prerequisites
             ;
 
-prerequisite:
+            // Для учета множественных зависимостей
+prerequisites:
+            prerequisites prerequisiteName
+            |
+            prerequisiteName
+            ;
+
+prerequisiteName:
             variableName
             |
             OBJECT_NAME
@@ -92,8 +142,14 @@ prerequisite:
             FILE_NAME
             |
             PATH
+            |
+            AUTOMATIC {
+                /* ERROR: Automatic variable in prerequisite */
+            }
             ;
 // -------------------------------------------------------
+
+// ---------------------- DEFINES ------------------------
 define:
             DEFINE OBJECT_NAME ENDL
             define_body 
@@ -118,6 +174,7 @@ define_body:
             |
             ENDL
             ;
+// -------------------------------------------------------
 
 // -------------------- CONDITIONS -----------------------
 condition:
