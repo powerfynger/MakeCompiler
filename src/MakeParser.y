@@ -1,4 +1,4 @@
-%token OBJECT_NAME, STR_ARG, SPECIAL, AUTOMATIC, FILE_NAME, PATH
+%token OBJECT_NAME, STR_ARG, SPECIAL_MODIFICATOR, AUTOMATIC, FILE_NAME, PATH
 
 %token IFEQ, IFNEQ, ELSE, ENDIF, IFDEF, IFNDEF, ENDEF
 
@@ -55,7 +55,14 @@ targetVar:
             |
             targetName ':' ':'
             |
-            SPECIAL ':'
+            // TODO
+            // Остальные виды символов между модификатором и его значением
+            // https://www.gnu.org/software/make/manual/html_node/Special-Variables.html
+            SPECIAL_MODIFICATOR ':'
+            |
+            SPECIAL_MODIFICATOR '+' '='
+            |
+            SPECIAL_MODIFICATOR '='
             ;
 
 targetName: 
