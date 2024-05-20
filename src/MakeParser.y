@@ -8,13 +8,12 @@ extern FILE* yyin;
 
 %}
 
-%token OBJECT_NAME, OBJECT_STR, SPECIAL_MODIFICATOR, AUTOMATIC, FILE_NAME, PATH
-%token IFEQ, IFNEQ, ELSE, ENDIF, IFDEF, IFNDEF, ENDEF
-%token INCLUDE, EXPORT, DEFINE
+%token OBJECT_NAME OBJECT_STR SPECIAL_MODIFICATOR AUTOMATIC FILE_NAME PATH
+%token IFEQ IFNEQ ELSE ENDIF IFDEF IFNDEF ENDEF
+%token INCLUDE EXPORT DEFINE
 %token ASSIGNMENT
-%token SHELL
+%token SHELL CMD
 %token ENDL
-%token EMPTY
 
 %start in
 
@@ -29,6 +28,8 @@ line:
             |
             target
             |
+            recipies
+            |
             variable
             |
             include
@@ -40,11 +41,11 @@ line:
 
 // ---------------------- TARGETS ------------------------
 target:     
-            targetVar prerequisites ENDL
+            targetVar prerequisite ENDL
             |
-            targetVar prerequisites ';' ENDL
+            targetVar prerequisite ';' ENDL
             |
-            targetVar prerequisites ';' recipies ENDL
+            targetVar prerequisite ';' atomics ENDL
             ;
 
 targetVar: 
@@ -114,7 +115,13 @@ prerequisiteName:
 
 // --------------------- RECIPIES ------------------------
 recipies: 
-            EMPTY
+            cmd ENDL
+            |
+            cmd atomics ENDL
+            ;
+
+cmd:
+            CMD
             ;
 // -------------------------------------------------------
 
@@ -226,15 +233,18 @@ substitution:
 // ---------------------- DEFINES ------------------------
 define:
             DEFINE OBJECT_NAME ENDL
-            define_body 
+            defineBody 
             ENDEF ENDL
             ;
 
-define_body:
-            // ...
-            SHELL
-            |
+defineBody:
             variableValue
+            |
+            defineSigns
+            |
+            ASSIGNMENT
+            |
+            SHELL
             |
             OBJECT_NAME
             |
@@ -247,6 +257,10 @@ define_body:
             OBJECT_STR
             |
             ENDL
+            ;
+
+defineSigns:
+            '-' | '+' | ':' | '&' | '>' | '<' | '[' | ']' | ';' | '/'
             ;
 // -------------------------------------------------------
 
@@ -290,7 +304,7 @@ arg:
 
 // ---------------------- INCLUDE ------------------------
 include:
-            INCLUDE filenames
+            INCLUDE filenames // Включение/исключение make-файлов в глубину
             ;
 
 filenames: 
@@ -304,7 +318,16 @@ filenames:
             ;
 // -------------------------------------------------------
 
+// ----------------------  ------------------------
+
+
 // -------------------------------------------------------
+
+atomics:
+            atomics atomic
+            |
+            atomic
+            ;
 
 atomic:
             variableValue
@@ -319,3 +342,28 @@ atomic:
             ;
 
 %%
+
+int main(int argc, char* argv[])
+{
+    if (argc != 2)
+    {
+        printf("[-] argument with the name of the input file is missing\n");
+        return DEFAULT_ERROR;
+    }
+    FILE* inputFile = fopen(argv[1], "r");
+    if (inputFile == NULL)
+    {
+        printf("[-] makefile %s doesn't exist\n", argv[1]);
+        return DEFAULT_ERROR;
+    }
+    yyin = inputFile;
+    yyparse();
+    fclose(yyin);
+}
+
+int yyerror(const char *s)
+{  
+    fprintf(stderr, "\n[-] Line %u: error - %s", yyline, s);
+    fprintf(stderr, "\nProgram finished analysis\n");
+    exit(0);
+}

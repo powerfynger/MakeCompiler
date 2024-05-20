@@ -1,8 +1,7 @@
 %{
-#include <stdio.h>
 #include "MakeParser.tab.h"
 
-int yyerror(const char *error)
+int yyerror2(const char *error)
 {  
     printf("\n-----Error occured-----\n%s\n", error);
 }
@@ -17,6 +16,9 @@ SPEC_CHAR [!@#\^&*()_+=-`~\[\]{};'"\\|,.<>\/?]
 OBJECT_NAME ({LETTER}|{SPEC_CHAR})+
 
 %%
+
+\n              { return ENDL;}
+[ \t]+\n        { return ENDL;}
 
 /* Обработка комментариев*/
 \#."*"       {}
@@ -34,12 +36,11 @@ OBJECT_NAME ({LETTER}|{SPEC_CHAR})+
 ^"else"                          { return ELSE; }
 ^"endif"                         { return ENDIF; }
 
-
-
 ^"unexport"                     { return EXPORT; }
 ^"export"                       { return EXPORT; }
-^"define"                       { return EXPORT; }
 ^"override"                     { return EXPORT; }
+
+^"define"                       { return DEFINE; }
 
 ^"include"                      { return INCLUDE; }
 
