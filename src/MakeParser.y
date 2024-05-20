@@ -8,7 +8,7 @@ extern FILE* yyin;
 
 %}
 
-%token OBJECT_NAME, STR_ARG, SPECIAL_MODIFICATOR, AUTOMATIC, FILE_NAME, PATH
+%token OBJECT_NAME, OBJECT_STR, SPECIAL_MODIFICATOR, AUTOMATIC, FILE_NAME, PATH
 %token IFEQ, IFNEQ, ELSE, ENDIF, IFDEF, IFNDEF, ENDEF
 %token INCLUDE, EXPORT, DEFINE
 %token ASSIGNMENT
@@ -29,51 +29,14 @@ line:
             |
             target
             |
+            variable
+            |
             include
             |
             define
             |
             condition
-            |
-            variable
             ;
-
-// --------------------- VARIABLES -----------------------
-variable: 
-            variableName ASSIGNMENT variableBody ENDL
-            |
-            EXPORT variable
-            |
-            EXPORT OBJECT_NAME ENDL
-            |
-            EXPORT ENDL
-
-            ;
-
-variableName:
-            OBJECT_NAME
-            |
-            FILE_NAME {
-                /* ERROR: Filename in variable name */
-            }
-            |
-            PATH {
-                /* ERROR: Path in variable name */
-            }
-            |
-            AUTOMATIC {
-                /* ERROR: Automatic variable in target */
-            }
-            ;
-
-variableBody:
-            EMPTY
-            ;
-
-variableValue:
-            EMPTY
-            ;
-// -------------------------------------------------------
 
 // ---------------------- TARGETS ------------------------
 target:     
@@ -149,6 +112,117 @@ prerequisiteName:
             ;
 // -------------------------------------------------------
 
+// --------------------- RECIPIES ------------------------
+recipies: 
+            EMPTY
+            ;
+// -------------------------------------------------------
+
+// --------------------- VARIABLES -----------------------
+variable: 
+            variableName ASSIGNMENT variableBody ENDL
+            |
+            EXPORT variable
+            |
+            EXPORT OBJECT_NAME ENDL
+            |
+            EXPORT ENDL
+            ;
+
+variableName:
+            OBJECT_NAME
+            |
+            FILE_NAME {
+                /* ERROR: Filename in variable name */
+            }
+            |
+            PATH {
+                /* ERROR: Path in variable name */
+            }
+            |
+            AUTOMATIC {
+                /* ERROR: Automatic variable in target */
+            }
+            ;
+
+variableBody:
+            OBJECT_NAME
+            |
+            OBJECT_STR
+            |
+            FILE_NAME
+            |
+            PATH
+            |
+            variableBody OBJECT_NAME
+            |
+            variableBody OBJECT_STR
+            |
+            variableBody FILE_NAME
+            |
+            variableBody PATH
+            |
+            '(' variableBody ')'
+            |
+            '{' variableBody '}'
+            |
+            variableBody '(' variableBody ')'
+            |
+            variableBody '{' variableBody '}'
+            |
+            variablePart
+            |
+            variableBody variablePart
+            ;
+
+variablePart:
+            SHELL
+            |
+            ASSIGNMENT
+            |
+            variableSigns
+            |
+            variableValue
+            ;
+
+            // Символы, которые могут встретиться в variableBody (например, -name; остальные - bash, cmd?)
+variableSigns:
+            '-' | '+' | ':' | '&' | '>' | '<' | '[' | ']' | ';' | '/'
+            ;
+
+variableValue:
+            '$' OBJECT_NAME
+            |
+            '$' '$' OBJECT_NAME // $$ Для передачи переменных в скрипты bash e.t.c.
+            |
+            '$' '(' OBJECT_NAME ')'
+            |
+            '$' '{' OBJECT_NAME '}'
+            |
+            '$' '$' '(' OBJECT_NAME ')'
+            |
+            '$' '$' '{' OBJECT_NAME '}'
+            |
+            '$' '(' variablePart ')'
+            |
+            '$' '{' variablePart '}'
+            |
+            '$' '(' OBJECT_NAME ':' substitution ASSIGNMENT substitution ')' // Ссылки на замену (Substitution References)
+            |
+            '$' '{' OBJECT_NAME ':' substitution ASSIGNMENT substitution '}'
+            |
+            '$' '(' variablePart ':' substitution ASSIGNMENT substitution ')'
+            |
+            '$' '{' variablePart ':' substitution ASSIGNMENT substitution '}'
+            ;
+
+substitution:
+            OBJECT_NAME
+            |
+            FILE_NAME
+            ;
+// -------------------------------------------------------
+
 // ---------------------- DEFINES ------------------------
 define:
             DEFINE OBJECT_NAME ENDL
@@ -170,7 +244,7 @@ define_body:
             |
             PATH
             |
-            STR_ARG
+            OBJECT_STR
             |
             ENDL
             ;
@@ -186,7 +260,7 @@ condition:
             |
             if '(' ',' ')' ENDL
             |
-            if STR_ARG STR_ARG ENDL
+            if OBJECT_STR OBJECT_STR ENDL
             |
             ifdef atomic ENDL
             |
@@ -210,7 +284,7 @@ ifdef:
 arg:
             atomic
             |
-            STR_ARG
+            OBJECT_STR
             ;
 // -------------------------------------------------------
 
@@ -230,10 +304,6 @@ filenames:
             ;
 // -------------------------------------------------------
 
-// --------------------- RECIPIES ------------------------
-recipies: 
-            EMPTY
-            ;
 // -------------------------------------------------------
 
 atomic:
