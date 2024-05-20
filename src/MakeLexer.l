@@ -50,6 +50,8 @@ $[@%\<?^+*]                      { return AUTOMATIC; }
 ^\.LIBPATTERNS                  { return SPECIAL_MODIFICATOR; }
 ^\.DELETE_ON_ERROR              { return SPECIAL_MODIFICATOR; }
 
+"::="|[":!?+"]?"="           { return ASSIGNMENT; }
+
 /* Нужно тестирование */
 .                               { 
                                     int pos = yycolumn;

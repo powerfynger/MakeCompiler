@@ -5,6 +5,8 @@
 %token INCLUDE
 %token DEFINE
 
+%token ASSIGNMENT
+
 %token SHELL
 
 %token ENDL
@@ -58,6 +60,7 @@ targetVar:
             // TODO
             // Остальные виды символов между модификатором и его значением
             // https://www.gnu.org/software/make/manual/html_node/Special-Variables.html
+            // Сравнить возможное наполнение токена ASSIGNMENT с тем, какие могут использоваться тут 
             SPECIAL_MODIFICATOR ':'
             |
             SPECIAL_MODIFICATOR '+' '='
