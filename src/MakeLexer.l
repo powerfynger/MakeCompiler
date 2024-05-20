@@ -1,19 +1,30 @@
 %{
 #include <stdio.h>
 #include "MakeParser.tab.h"
+
+int yyerror(const char *error)
+{  
+    printf("\n-----Error occured-----\n%s\n", error);
+}
 %}
 
 %option yylineno
 %option noyywrap
 
+LETTER [[:alpha:]]
+DIGIT [[:digit:]]
+SPEC_CHAR [_@(){}[\]\-+\|/&<>`!?,;]
+OBJECT_NAME ({LETTER}|{SPEC_CHAR})+
+
 %%
 
-OBJECT_NAME [a-zA-Z_]
-DIGIT [0-9]
+
 
 [(){}[\]$\-+"\|/&<>`!?,:;]       { return *yytext; }
 $[@%\<?^+*]                      { return AUTOMATIC; }
 
+
+/* Обработка условных операторов */
 ^"ifdef"                         { return IFDEF; }
 ^"ifndef"                        { return IFNDEF; }
 ^"endef"                         { return ENDEF; }
@@ -29,32 +40,27 @@ $[@%\<?^+*]                      { return AUTOMATIC; }
 ^"include"                      { return INCLUDE; }
 ^"define"                       { return DEFINE; }
 
-^\.DEFAULT                      { return SPECIAL_MODIFICATOR; }
-^\.DELETE_ON_ERROR              { return SPECIAL_MODIFICATOR; }
-^\.EXPORT_ALL_VARIABLES         { return SPECIAL_MODIFICATOR; }
-^\.IGNORE                       { return SPECIAL_MODIFICATOR; }
-^\.INTERMEDIATE                 { return SPECIAL_MODIFICATOR; }
-^\.LOW_RESOLUTION_TIME          { return SPECIAL_MODIFICATOR; }
-^\.NOTINTERMEDIATE              { return SPECIAL_MODIFICATOR; }
-^\.NOTPARALLEL                  { return SPECIAL_MODIFICATOR; }
-^\.ONESHELL                     { return SPECIAL_MODIFICATOR; }
-^\.PHONY                        { return SPECIAL_MODIFICATOR; }
-^\.POSIX                        { return SPECIAL_MODIFICATOR; }
-^\.PRECIOUS                     { return SPECIAL_MODIFICATOR; }
-^\.SECONDARY                    { return SPECIAL_MODIFICATOR; }
-^\.SECONDEXPANSION              { return SPECIAL_MODIFICATOR; }
-^\.SILENT                       { return SPECIAL_MODIFICATOR; }
-^\.SUFFIXES                     { return SPECIAL_MODIFICATOR; }
-^\.RECIPEPREFIX                 { return SPECIAL_MODIFICATOR; }
-^\.INCLUDE_DIRS                 { return SPECIAL_MODIFICATOR; }
-^\.LIBPATTERNS                  { return SPECIAL_MODIFICATOR; }
-^\.DELETE_ON_ERROR              { return SPECIAL_MODIFICATOR; }
+/* Обработка специальных целей */
+/* TODO: В .y добавить проверку на существование заданной спец. цели */
+^"."(({LETTER}|{SPEC_CHAR})+)    { return SPECIAL_MODIFICATOR; }
+
+/* Обработка имён целей, файлов, путей к файлам */
+({LETTER}|{DIGIT}|{SPEC_CHAR})+  { yylval.str = strdup(yytext); return OBJECT_NAME; }
+({LETTER}|{DIGIT}|{SPEC_CHAR}|".")+ { yylval.str = strdup(yytext); return FILE_NAME; }
+
+
+
+/* Обратока комманд шелл-оболочки https://www.gnu.org/software/make/manual/html_node/Shell-Function.html */
+\$\((shell[^)]*\))                { return SHELL; }
+
 
 "::="|[":!?+"]?"="           { return ASSIGNMENT; }
+
 
 /* Нужно тестирование */
 .                               { 
                                     int pos = yycolumn;
+                                    yyerror("Unrecognized symbol");
                                     fprintf(stderr, "Unrecognized symbol '%s' in line %d, position %d\n", yytext, yylineno, pos);
                                 }
 
