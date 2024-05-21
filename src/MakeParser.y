@@ -12,7 +12,7 @@ extern FILE* yyin;
 %token IFEQ IFNEQ ELSE ENDIF IFDEF IFNDEF ENDEF
 %token INCLUDE EXPORT DEFINE
 %token ASSIGNMENT
-%token SHELL CMD
+%token SHELL OBJECT_RECIPIE
 %token ENDL
 
 %start in
@@ -111,13 +111,13 @@ prerequisiteName:
 
 // --------------------- RECIPIES ------------------------
 recipies: 
-            cmd ENDL
+            recipiePart ENDL
             |
-            cmd atomics ENDL
+            recipiePart atomics ENDL
             ;
 
-cmd:
-            CMD
+recipiePart:
+            OBJECT_RECIPIE
             ;
 // -------------------------------------------------------
 

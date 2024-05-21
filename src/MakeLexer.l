@@ -21,15 +21,13 @@ OBJECT_RECIPIE ^(\@[^\@]*\@)?\t[^\n]*
 \n              { return ENDL; }
 [ \t]+\n        { return ENDL; }
 
-/* Обработка комментариев*/
-\#."*"       {}
+\#."*"       {} /* Обработка комментариев */
 
 [(){}[\]$\-+"\|/&<>`!?,:;]       { return *yytext; }
 \$[@%\<?^+*]                     { return AUTOMATIC; }
 
 
-/* Обработка условных операторов */
-^"ifdef"                         { return IFDEF; }
+^"ifdef"                         { return IFDEF; } /* Обработка условных операторов */
 ^"ifndef"                        { return IFNDEF; }
 ^"endef"                         { return ENDEF; }
 ^"ifeq"                          { return IFEQ; }
@@ -45,42 +43,32 @@ OBJECT_RECIPIE ^(\@[^\@]*\@)?\t[^\n]*
 
 ^"include"                      { return INCLUDE; }
 
-/* Обработка специальных целей */
-/* TODO: В .y добавить проверку на существование заданной спец. цели */
-^"."(({LETTER}|{SPEC_CHAR})+)    { return OBJECT_SPECIAL; }
+^"."(({LETTER}|{SPEC_CHAR})+)    { return OBJECT_SPECIAL; } /* Обработка специальных целей; TODO: В .y добавить проверку на существование заданной спец. цели */
 
-/* Обработка имён целей, файлов, путей к файлам */
-({LETTER}|{DIGIT}|{SPEC_CHAR})+  { yylval.str = strdup(yytext); return OBJECT_NAME; }
+({LETTER}|{DIGIT}|{SPEC_CHAR})+  { yylval.str = strdup(yytext); return OBJECT_NAME; } /* Обработка имён целей, файлов, путей к файлам */
 \%({LETTER}|{DIGIT}|{SPEC_CHAR})*    { yylval.str = strdup(yytext); return OBJECT_NAME; }
 
 ({LETTER}|{DIGIT}|{SPEC_CHAR}|".")+ { yylval.str = strdup(yytext); return FILE_NAME; }
 
+{LETTER}{DIGIT}?:\\({LETTER}|{DIGIT}|{SPEC_CHAR})+\\({LETTER}|{DIGIT}|{SPEC_CHAR})+ { yylval.str = strdup(yytext); return PATH; } /* Обработка абсолютного пути для Windows */
 
-/* Обработка абсолютного пути для Windows */
-{LETTER}{DIGIT}?:\\({LETTER}|{DIGIT}|{SPEC_CHAR})+\\({LETTER}|{DIGIT}|{SPEC_CHAR})+ { yylval.str = strdup(yytext); return PATH; }
-/* Обработка абсолютного пути для Unix */
-\/({LETTER}|{DIGIT}|{SPEC_CHAR})+(\/({LETTER}|{DIGIT}|{SPEC_CHAR})+)+               { yylval.str = strdup(yytext); return PATH; }
-/* Обработка относительного пути для Unix */
-({LETTER}|{DIGIT}|{SPEC_CHAR})+\\({LETTER}|{DIGIT}|{SPEC_CHAR})+                    { yylval.str = strdup(yytext); return PATH; }
-/* Обработка относительного пути для Windows */
-({LETTER}|{DIGIT}|{SPEC_CHAR})+(\/({LETTER}|{DIGIT}|{SPEC_CHAR})+)+                 { yylval.str = strdup(yytext); return PATH; }
+\/({LETTER}|{DIGIT}|{SPEC_CHAR})+(\/({LETTER}|{DIGIT}|{SPEC_CHAR})+)+               { yylval.str = strdup(yytext); return PATH; } /* Обработка абсолютного пути для Unix */
+
+({LETTER}|{DIGIT}|{SPEC_CHAR})+\\({LETTER}|{DIGIT}|{SPEC_CHAR})+                    { yylval.str = strdup(yytext); return PATH; } /* Обработка относительного пути для Unix */
+
+({LETTER}|{DIGIT}|{SPEC_CHAR})+(\/({LETTER}|{DIGIT}|{SPEC_CHAR})+)+                 { yylval.str = strdup(yytext); return PATH; } /* Обработка относительного пути для Windows */
 
 
-/* Обработка команд шелл-оболочки https://www.gnu.org/software/make/manual/html_node/Shell-Function.html */
-\$\((shell[^)]*\))                { return SHELL; }
-
+\$\((shell[^)]*\))                { return SHELL; } /* Обработка команд шелл-оболочки https://www.gnu.org/software/make/manual/html_node/Shell-Function.html */
 
 "::="|[":!?+"]?"="                { return ASSIGNMENT; }
 
-/* Обработка разных значений переменных */
-\"[^\"]*\"|\'[^\']*\'           { yylval.str = strdup(yytext); return OBJECT_STR; }
+\"[^\"]*\"|\'[^\']*\'           { yylval.str = strdup(yytext); return OBJECT_STR; } /* Обработка разных значений переменных */
 
-/* Нужно тестирование */
 .                               { 
-                                    int pos = yycolumn;
+                                    int pos = yycolumn; /* Нужно тестирование */
                                     yyerror("Unrecognized symbol");
                                     fprintf(stderr, "Unrecognized symbol '%s' in line %d, position %d\n", yytext, yylineno, pos);
                                 }
-
 
 %%
