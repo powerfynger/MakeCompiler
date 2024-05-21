@@ -1,1 +1,5 @@
+.vscode
 build
+testFiles
+mk.l
+mk.y
