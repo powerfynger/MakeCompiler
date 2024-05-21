@@ -4,7 +4,7 @@
 #define YYSTYPE unsigned long long
 int yyerror(const char *s);
 
-unsigned int g_line_amt = 0;
+unsigned int currLine = 1;
 static void UpdateLine();
 
 %}
@@ -14,13 +14,13 @@ static void UpdateLine();
 
 LETTER [[:alpha:]]
 DIGIT [[:digit:]]
-SPEC_CHAR [.\-*<>!_@`=()\\/]
-OBJECT_RECIPIE \t[^\n]*      
+SPEC_CHAR [.\-*<>!_@`\\/+]
 CONTINUE_LINE (\\\n[ \t]*[^\n]*)* 
+OBJECT_RECIPIE \t[^\n]*      
 
 %%
 {OBJECT_RECIPIE}                            { yylval.str = strdup(yytext); return OBJECT_RECIPIE; }  /* SPEC_CHAR [!@#\^&*()_+=\-`~\[\]{};'"\\\|,<>\/?] */
-{OBJECT_RECIPIE}{CONTINUE_LINE}         {  UpdateLine(); yylval.str = strdup(yytext); return OBJECT_RECIPIE;}
+{OBJECT_RECIPIE}                            { UpdateLine(); yylval.str = strdup(yytext); return OBJECT_RECIPIE;}
 
 
 
@@ -29,8 +29,8 @@ CONTINUE_LINE (\\\n[ \t]*[^\n]*)*
 [(){}[\]$\-+"\|/&<>`!?,:;]       { return *yytext; }
 \$[@%\<?^+*]                     { return AUTOMATIC; }
 
-\n              { ++g_line_amt; return ENDL; }
-[ \t]+\n        { ++g_line_amt;return ENDL; }
+\n              { ++currLine; return ENDL; }
+[ \t]+\n        { ++currLine;return ENDL; }
 
 ^"ifdef"                         { return IFDEF; } /* Обработка условных операторов */
 ^"ifndef"                        { return IFNDEF; }
@@ -49,7 +49,7 @@ CONTINUE_LINE (\\\n[ \t]*[^\n]*)*
 ^"include"                      { return INCLUDE; }
 
 \"[^\"]*\"{CONTINUE_LINE}|\'[^\']*\'{CONTINUE_LINE}           { UpdateLine(); yylval.str = strdup(yytext); return OBJECT_STR; } /* Обработка разных значений переменных */
-"::="|[":!?+"]?"="              { return ASSIGNMENT; }
+"::="|":::="|[":!?+"]?"="              { return ASSIGNMENT; }
 
 \/({LETTER}|{DIGIT}|{SPEC_CHAR})+(\/({LETTER}|{DIGIT}|{SPEC_CHAR})+)+               { yylval.str = strdup(yytext); return PATH; } /* Обработка абсолютного пути для Unix */
 
@@ -68,7 +68,7 @@ CONTINUE_LINE (\\\n[ \t]*[^\n]*)*
 
 {LETTER}{DIGIT}?:\\({LETTER}|{DIGIT}|{SPEC_CHAR})+\\({LETTER}|{DIGIT}|{SPEC_CHAR})+ { yylval.str = strdup(yytext); return PATH; } /* Обработка абсолютного пути для Windows */
 
-\\[\r]?\n[ \t]*                                                             { ++g_line_amt;}
+\\[\r]?\n[ \t]*                                                             { ++currLine;}
 
 
 \$\((shell[^)]*\))                { return SHELL; } /* Обработка команд шелл-оболочки https://www.gnu.org/software/make/manual/html_node/Shell-Function.html */
@@ -84,7 +84,9 @@ CONTINUE_LINE (\\\n[ \t]*[^\n]*)*
 %%
 
 static void UpdateLine() {
-    int line = g_line_amt;
+    int line = currLine;
+    // printf("Line: %d\n", line);
+
     char *p = yytext + strlen(yytext) - 1;
     while (p >= yytext && *p == '\n') {
         p--;
@@ -96,5 +98,6 @@ static void UpdateLine() {
         line++;
         p--;
     }
-    g_line_amt = line;
+    // printf("Line: %d\nChar: %s", line, p);
+    currLine = line;
 }

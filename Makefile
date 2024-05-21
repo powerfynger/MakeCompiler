@@ -5,6 +5,9 @@ MOVE = mv
 
 objects = "as"\
 "asd"\
+"asd"\
+"asd"\
+"asd"\
 "a"
 
 PARSER_FILE = ./src/MakeParser.y

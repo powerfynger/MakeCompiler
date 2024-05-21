@@ -59,6 +59,8 @@ target:
             targetVar prerequisite ';' ENDL
             |
             targetVar prerequisite ';' atomics ENDL
+            |
+            targetVar prerequisite ASSIGNMENT targetExpr ENDL
             ;
 
 targetVar: 
@@ -179,7 +181,7 @@ variableBody:
             }
             |
             FILE_NAME {char temp[256];
-                sprintf(temp, "ariableBody: %s", (char*)$1);
+                sprintf(temp, "variableBody: %s", (char*)$1);
                 debugPrint(temp);}
             |
             PATH
@@ -199,6 +201,8 @@ variableBody:
             variableBody '(' variableBody ')'
             |
             variableBody '{' variableBody '}'
+            |
+            variableBody ','
             |
             variablePart
             |
