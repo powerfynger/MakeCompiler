@@ -5,6 +5,8 @@ int targetCount = 0;
 char** variableList = NULL;
 int variableCount = 0;
 
+int currState = 0;
+
 void addTarget(char* targetName)
 {
     if (!targetCount)
@@ -39,4 +41,15 @@ int checkTarget(char* targetName)
         }
     }
     return result;    
+}
+
+void setState(int state)
+{
+    currState = state;
+}
+
+void checkState()
+{
+    if (currState == 0)
+        yyerror("recipie not in target");
 }

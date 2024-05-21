@@ -2,7 +2,6 @@
 #include "MakeHelper.h"
 
 int yyparse();
-int yyerror(const char *s);
 extern int yylex();
 extern FILE* yyin;
 extern int yylineno;
@@ -29,19 +28,18 @@ void debugPrint(char* value);
 
 %%
 
-in: 
-            line
+in:
             | in line
             ;
 
 line: 
             ENDL
             |
-            target
+            target { setState(1); }
             |
-            recipies
+            recipies { checkState(); }
             |
-            variable
+            variable { setState(0); }
             |
             include
             |
@@ -110,7 +108,7 @@ prerequisiteName:
             PATH
             |
             AUTOMATIC {
-                /* ERROR: Automatic variable in prerequisite */ 
+                yyerror("automatic variable in prerequisite");
             }
             ;
 // -------------------------------------------------------
@@ -124,9 +122,9 @@ recipies:
 
 recipiePart:
             OBJECT_RECIPIE { 
-                /*char temp[256];
+                char temp[256];
                 sprintf(temp, "recipies: %s", (char*)$1);
-                debugPrint(temp);*/ }
+                debugPrint(temp); }
             ;
 // -------------------------------------------------------
 
@@ -147,20 +145,24 @@ variableName:
             OBJECT_NAME { addVariable((char*)$1); }
             |
             FILE_NAME {
-                /* ERROR: Filename in variable name */
+                yyerror("filename in variable name");
             }
             |
             PATH {
-                /* ERROR: Path in variable name */
+                yyerror("path in variable name");
             }
             |
             AUTOMATIC {
-                /* ERROR: Automatic variable in target */
+                yyerror("automatic variable in variable name");
             }
             ;
 
 variableBody:
-            OBJECT_NAME
+            OBJECT_NAME { 
+                char temp[256];
+                sprintf(temp, "variableBody: %s", (char*)$1);
+                debugPrint(temp);
+            }
             |
             OBJECT_STR
             |
@@ -324,9 +326,6 @@ filenames:
             PATH
             ;
 // -------------------------------------------------------
-
-// ----------------------  ------------------------
-
 
 // -------------------------------------------------------
 
