@@ -8,7 +8,7 @@ extern FILE* yyin;
 
 %}
 
-%token OBJECT_NAME OBJECT_STR SPECIAL_MODIFICATOR AUTOMATIC FILE_NAME PATH
+%token OBJECT_NAME OBJECT_STR OBJECT_SPECIAL AUTOMATIC FILE_NAME PATH
 %token IFEQ IFNEQ ELSE ENDIF IFDEF IFNDEF ENDEF
 %token INCLUDE EXPORT DEFINE
 %token ASSIGNMENT
@@ -53,15 +53,11 @@ targetVar:
             |
             targetExpr ':' ':'
             |
-            // TODO
-            // Остальные виды символов между модификатором и его значением
-            // https://www.gnu.org/software/make/manual/html_node/Special-Variables.html
-            // Сравнить возможное наполнение токена ASSIGNMENT с тем, какие могут использоваться тут 
-            SPECIAL_MODIFICATOR ':'
+            OBJECT_SPECIAL ':'
             |
-            SPECIAL_MODIFICATOR '+' '='
+            OBJECT_SPECIAL '+' '='
             |
-            SPECIAL_MODIFICATOR '='
+            OBJECT_SPECIAL '='
             ;
 
             // Для учета "фейк" (пустых) целей

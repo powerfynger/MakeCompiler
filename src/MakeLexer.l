@@ -13,18 +13,17 @@ int yyerror2(const char *error)
 LETTER [[:alpha:]]
 DIGIT [[:digit:]]
 SPEC_CHAR [!@#\^&*()_+=-`~\[\]{};'"\\|,.<>\/?]
-OBJECT_NAME ({LETTER}|{SPEC_CHAR})+
 
 %%
 
-\n              { return ENDL;}
-[ \t]+\n        { return ENDL;}
+\n              { return ENDL; }
+[ \t]+\n        { return ENDL; }
 
 /* Обработка комментариев*/
 \#."*"       {}
 
 [(){}[\]$\-+"\|/&<>`!?,:;]       { return *yytext; }
-\$[@%\<?^+*]                      { return AUTOMATIC; }
+\$[@%\<?^+*]                     { return AUTOMATIC; }
 
 
 /* Обработка условных операторов */
@@ -46,11 +45,11 @@ OBJECT_NAME ({LETTER}|{SPEC_CHAR})+
 
 /* Обработка специальных целей */
 /* TODO: В .y добавить проверку на существование заданной спец. цели */
-^"."(({LETTER}|{SPEC_CHAR})+)    { return SPECIAL_MODIFICATOR; }
+^"."(({LETTER}|{SPEC_CHAR})+)    { return OBJECT_SPECIAL; }
 
 /* Обработка имён целей, файлов, путей к файлам */
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+  { yylval.str = strdup(yytext); return OBJECT_NAME; }
-\%({LETTER}|{DIGIT}|{SPEC_CHAR})*    {yylval.str = strdup(yytext); return OBJECT_NAME; }    
+\%({LETTER}|{DIGIT}|{SPEC_CHAR})*    { yylval.str = strdup(yytext); return OBJECT_NAME; }
 
 ({LETTER}|{DIGIT}|{SPEC_CHAR}|".")+ { yylval.str = strdup(yytext); return FILE_NAME; }
 
@@ -69,10 +68,10 @@ OBJECT_NAME ({LETTER}|{SPEC_CHAR})+
 \$\((shell[^)]*\))                { return SHELL; }
 
 
-"::="|[":!?+"]?"="           { return ASSIGNMENT; }
+"::="|[":!?+"]?"="                { return ASSIGNMENT; }
 
 /* Обработка разных значений переменных */
-\"[^\"]*\"|\'[^\']*\'           { yylval.str = strdup(yytext); return STR_ARG; }
+\"[^\"]*\"|\'[^\']*\'           { yylval.str = strdup(yytext); return OBJECT_STR; }
 
 /* Нужно тестирование */
 .                               { 
