@@ -6,6 +6,8 @@ int yyerror(const char *s);
 
 unsigned int currLine = 1;
 static void skipLines();
+static void parseFunction(char **text)
+
 
 %}
 
@@ -40,13 +42,21 @@ OBJECT_RECIPIE \t[^\n]*
 ^"else"                          { return ELSE; }
 ^"endif"                         { return ENDIF; }
 
-^"unexport"                     { return EXPORT; }
-^"export"                       { return EXPORT; }
-^"override"                     { return EXPORT; }
+^"unexport"                      { return EXPORT; }
+^"export"                        { return EXPORT; }
+^"override"                      { return EXPORT; }
 
-^"define"                       { return DEFINE; }
+^"define"                        { return DEFINE; }
 
-^"include"                      { return INCLUDE; }
+^"include"                       { return INCLUDE; }
+
+$\(                        
+    { 
+    char *text = NULL;
+    parseFunction(&text);
+    yylval.str = text; 
+    return FUNCTION;
+    }
 
 \"[^\"]*\"{CONTINUE_LINE}|\'[^\']*\'{CONTINUE_LINE}           { skipLines(); yylval.str = strdup(yytext); return OBJECT_STR; } /* Обработка разных значений переменных */
 "::="|":::="|[":!?+"]?"="              { return ASSIGNMENT; }
@@ -82,6 +92,58 @@ OBJECT_RECIPIE \t[^\n]*
                                 }
 
 %%
+
+
+static void parseFunction(char **text)
+{
+    int c = 0; 
+    int sc_count = 1; 
+    int prev = 0;
+    size_t len = 0;
+    *text = NULL;
+    while((c=input())) 
+    { 
+        switch (c)
+        {
+            case ')': 
+            { 
+                if(--sc_count == 0) 
+                {
+                    *text = realloc(*text, len + 2);
+                    (*text)[len++] = (char)c; 
+                    (*text)[len] = '\0';
+                    return;
+                }
+                break;
+            }
+            case '(':
+            { 
+                ++sc_count;
+                break;
+            }
+            case '\n':
+            {
+                if (prev == '\\')
+                {
+                    ++g_line_amt;
+                    *text = realloc(*text, len + 3);
+                    (*text)[len++] = '\\'; 
+                    (*text)[len++] = '\n'; 
+                }
+                else
+                    yyerror("syntax function error");                
+                break;
+            }
+            default:
+            {
+                *text = realloc(*text, len + 2);
+                (*text)[len++] = (char)c; 
+                prev = c; 
+                break;
+            }
+        }
+    }
+}
 
 static void skipLines() {
     int line = currLine;
