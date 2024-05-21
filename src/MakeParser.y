@@ -172,7 +172,7 @@ variableBody:
                 debugPrint(temp);
             }
             |
-            OBJECT_STR{
+            OBJECT_STR {
                 char temp[256];
                 sprintf(temp, "variableBody: %s", (char*)$1);
                 debugPrint(temp);
@@ -256,7 +256,11 @@ substitution:
 // ---------------------- DEFINES ------------------------
 define:
             DEFINE OBJECT_NAME ENDL
-            defineBody 
+            defineBody ENDL
+            ENDEF ENDL
+            |
+            DEFINE OBJECT_NAME ASSIGNMENT ENDL
+            defineBody ENDL
             ENDEF ENDL
             ;
 
