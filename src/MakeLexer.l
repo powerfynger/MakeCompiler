@@ -14,14 +14,15 @@ OBJECT_RECIPIE ^(\@[^\@]*\@)?\t[^\n]*
 %%
 {OBJECT_RECIPIE}                        { return OBJECT_RECIPIE; }
 
-\n              { return ENDL; }
-[ \t]+\n        { return ENDL; }
+
 
 \#.*       {} /* Обработка комментариев */
 
 [(){}[\]$\-+"\|/&<>`!?,:;]       { return *yytext; }
 \$[@%\<?^+*]                     { return AUTOMATIC; }
 
+\n              { return ENDL; }
+[ \t]+\n        { return ENDL; }
 
 ^"ifdef"                         { return IFDEF; } /* Обработка условных операторов */
 ^"ifndef"                        { return IFNDEF; }
@@ -41,6 +42,8 @@ OBJECT_RECIPIE ^(\@[^\@]*\@)?\t[^\n]*
 
 ^"."(({LETTER}|{SPEC_CHAR})+)    { return OBJECT_SPECIAL; } /* Обработка специальных целей; TODO: В .y добавить проверку на существование заданной спец. цели */
 
+"::="|[":!?+"]?"="                { return ASSIGNMENT; }
+
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+  { yylval.str = strdup(yytext); return OBJECT_NAME; } /* Обработка имён целей, файлов, путей к файлам */
 \%({LETTER}|{DIGIT}|{SPEC_CHAR})*    { yylval.str = strdup(yytext); return OBJECT_NAME; }
 
@@ -57,10 +60,10 @@ OBJECT_RECIPIE ^(\@[^\@]*\@)?\t[^\n]*
 
 \$\((shell[^)]*\))                { return SHELL; } /* Обработка команд шелл-оболочки https://www.gnu.org/software/make/manual/html_node/Shell-Function.html */
 
-"::="|[":!?+"]?"="                { return ASSIGNMENT; }
 
 \"[^\"]*\"|\'[^\']*\'           { yylval.str = strdup(yytext); return OBJECT_STR; } /* Обработка разных значений переменных */
 
+[ \t]
 .                               {
                                     yyerror("Unrecognized symbol");
                                     fprintf(stderr, "Unrecognized symbol '%s' in line %d\n", yytext, yylineno);
