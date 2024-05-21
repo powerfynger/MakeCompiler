@@ -1,6 +1,5 @@
 %{
-#include <stdio.h>
-#include <stdlib.h>
+#include "MakeHelper.h"
 
 int yyparse();
 int yyerror(const char *s);
@@ -38,9 +37,9 @@ in:
 line: 
             ENDL
             |
-            target { debugPrint("target"); }
+            target
             |
-            recipies { debugPrint("RECEIPT"); }
+            recipies
             |
             variable
             |
@@ -53,7 +52,7 @@ line:
 
 // ---------------------- TARGETS ------------------------
 target:     
-            targetVar ENDL { debugPrint("target2"); }
+            targetVar ENDL
             |
             targetVar prerequisite ENDL
             |
@@ -63,9 +62,9 @@ target:
             ;
 
 targetVar: 
-            targetExpr ':' { debugPrint("target3"); }
+            targetName ':'
             |
-            targetExpr ':' ':'
+            targetName ':' ':'
             |
             OBJECT_SPECIAL ':'
             |
@@ -74,27 +73,17 @@ targetVar:
             OBJECT_SPECIAL '='
             ;
 
-            // Для учета "фейк" (пустых) целей
-targetExpr:
-            targetExpr targetName
-            |
-            targetName
-            ;
-
 targetName: 
             variableValue
             |
-            OBJECT_NAME { 
-                char temp[256];
-                sprintf(temp, "target Name: %s", (char*)$1);
-                debugPrint(temp); }
+            OBJECT_NAME { addTarget((char*)$1); }
             |
-            FILE_NAME
+            FILE_NAME { addTarget((char*)$1); }
             |
-            PATH
+            PATH { addTarget((char*)$1); }
             |
             AUTOMATIC {
-                /* ERROR: Automatic variable in target */
+                yyerror("automatic variable in target");
             }
             ;
 // -------------------------------------------------------
@@ -121,7 +110,7 @@ prerequisiteName:
             PATH
             |
             AUTOMATIC {
-                /* ERROR: Automatic variable in prerequisite */
+                /* ERROR: Automatic variable in prerequisite */ 
             }
             ;
 // -------------------------------------------------------
@@ -135,17 +124,17 @@ recipies:
 
 recipiePart:
             OBJECT_RECIPIE { 
-                char temp[256];
+                /*char temp[256];
                 sprintf(temp, "recipies: %s", (char*)$1);
-                debugPrint(temp); }
+                debugPrint(temp);*/ }
             ;
 // -------------------------------------------------------
 
 // --------------------- VARIABLES -----------------------
 variable: 
-            variableName ASSIGNMENT variableBody ENDL { debugPrint("variable"); }
+            variableName ASSIGNMENT variableBody ENDL
             |
-            variableName ASSIGNMENT ENDL { debugPrint("variable empty"); }
+            variableName ASSIGNMENT ENDL
             |
             EXPORT variable
             |
@@ -155,7 +144,7 @@ variable:
             ;
 
 variableName:
-            OBJECT_NAME
+            OBJECT_NAME { addVariable((char*)$1); }
             |
             FILE_NAME {
                 /* ERROR: Filename in variable name */

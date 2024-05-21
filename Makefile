@@ -6,7 +6,7 @@ MOVE = mv
 PARSER_FILE = ./src/MakeParser.y
 FLEX_FILE = ./src/MakeLexer.l
 RESULT_FILES = ./build/lex.yy.c ./build/MakeParser.tab.c ./build/MakeParser.tab.h logs.txt ./build/maker
-BUILD_FILES = ./build/lex.yy.c ./build/MakeParser.tab.c
+BUILD_FILES = ./build/lex.yy.c ./build/MakeParser.tab.c ./src/MakeHelper.c
 
 log:
 	$(YACC) -d $(PARSER_FILE) -Wcounterexamples 2> logs.txt
@@ -20,6 +20,6 @@ run:
 	$(MOVE) lex.yy.c ./build
 	$(MOVE) MakeParser.tab.h ./build
 	$(MOVE) MakeParser.tab.c ./build
-	$(CC) $(BUILD_FILES) -lm -o ./build/maker
+	$(CC) $(BUILD_FILES) -I ./src/ -lm -o ./build/maker
 
 all: clean run

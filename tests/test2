@@ -21,7 +21,7 @@ CPPFLAGS = -E
 ## For experimental MPI_Barrier support, add -DJOHN_MPI_BARRIER too.
 ## For experimental MPI_Abort support, add -DJOHN_MPI_ABORT too.
 #CC = mpicc -DHAVE_MPI
-#MPIOBJ = john-mpi.o
+MPIOBJ = john-mpi.o
 
 OMPFLAGS =
 # gcc with OpenMP
@@ -174,7 +174,7 @@ BENCH_BF_OBJS_DEPEND = \
 	BF_fmt.o BF_std.o
 
 BENCH_OBJS = \
-    $(MPIOBJ) \
+	$(MPIOBJ) \
 	$(BENCH_DES_OBJS_DEPEND) \
 	DES_bsg.o $(BENCH_DES_BS_OBJS_DEPEND) \
 	$(BENCH_MD5_OBJS_DEPEND) \
