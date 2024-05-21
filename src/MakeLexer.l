@@ -5,7 +5,7 @@
 int yyerror(const char *s);
 
 unsigned int currLine = 1;
-static void UpdateLine();
+static void skipLines();
 
 %}
 
@@ -20,7 +20,7 @@ OBJECT_RECIPIE \t[^\n]*
 
 %%
 {OBJECT_RECIPIE}                            { yylval.str = strdup(yytext); return OBJECT_RECIPIE; }  /* SPEC_CHAR [!@#\^&*()_+=\-`~\[\]{};'"\\\|,<>\/?] */
-{OBJECT_RECIPIE}                            { UpdateLine(); yylval.str = strdup(yytext); return OBJECT_RECIPIE;}
+{OBJECT_RECIPIE}                            { skipLines(); yylval.str = strdup(yytext); return OBJECT_RECIPIE;}
 
 
 
@@ -48,7 +48,7 @@ OBJECT_RECIPIE \t[^\n]*
 
 ^"include"                      { return INCLUDE; }
 
-\"[^\"]*\"{CONTINUE_LINE}|\'[^\']*\'{CONTINUE_LINE}           { UpdateLine(); yylval.str = strdup(yytext); return OBJECT_STR; } /* Обработка разных значений переменных */
+\"[^\"]*\"{CONTINUE_LINE}|\'[^\']*\'{CONTINUE_LINE}           { skipLines(); yylval.str = strdup(yytext); return OBJECT_STR; } /* Обработка разных значений переменных */
 "::="|":::="|[":!?+"]?"="              { return ASSIGNMENT; }
 
 \/({LETTER}|{DIGIT}|{SPEC_CHAR})+(\/({LETTER}|{DIGIT}|{SPEC_CHAR})+)+               { yylval.str = strdup(yytext); return PATH; } /* Обработка абсолютного пути для Unix */
@@ -57,9 +57,9 @@ OBJECT_RECIPIE \t[^\n]*
 
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+(\/({LETTER}|{DIGIT}|{SPEC_CHAR})+)+                 { yylval.str = strdup(yytext); return PATH; } /* Обработка относительного пути для Windows */
 
-({LETTER}|{DIGIT}|{SPEC_CHAR})+"."({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}  { UpdateLine(); yylval.str = strdup(yytext); return FILE_NAME; }
+({LETTER}|{DIGIT}|{SPEC_CHAR})+"."({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}  { skipLines(); yylval.str = strdup(yytext); return FILE_NAME; }
 
-({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}   { UpdateLine(); yylval.str = strdup(yytext); return OBJECT_NAME; } /* Обработка имён целей, файлов, путей к файлам */
+({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}   { skipLines(); yylval.str = strdup(yytext); return OBJECT_NAME; } /* Обработка имён целей, файлов, путей к файлам */
 
 ^"."(({LETTER}|{SPEC_CHAR})+)    { yylval.str = strdup(yytext); return OBJECT_SPECIAL; } /* Обработка специальных целей; TODO: В .y добавить проверку на существование заданной спец. цели */
 
@@ -83,7 +83,7 @@ OBJECT_RECIPIE \t[^\n]*
 
 %%
 
-static void UpdateLine() {
+static void skipLines() {
     int line = currLine;
     // printf("Line: %d\n", line);
 
