@@ -13,8 +13,10 @@ int yyerror2(const char *error)
 LETTER [[:alpha:]]
 DIGIT [[:digit:]]
 SPEC_CHAR [!@#\^&*()_+=-`~\[\]{};'"\\|,.<>\/?]
+OBJECT_RECIPIE ^(\@[^\@]*\@)?\t[^\n]*      
 
 %%
+{OBJECT_RECIPIE}                        { return OBJECT_RECIPIE; }
 
 \n              { return ENDL; }
 [ \t]+\n        { return ENDL; }
