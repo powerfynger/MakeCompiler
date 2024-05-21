@@ -1,10 +1,6 @@
 %{
 #include "MakeParser.tab.h"
-
-int yyerror2(const char *error)
-{  
-    printf("\n-----Error occured-----\n%s\n", error);
-}
+int yyerror(const char *s);
 %}
 
 %option yylineno
@@ -65,10 +61,9 @@ OBJECT_RECIPIE ^(\@[^\@]*\@)?\t[^\n]*
 
 \"[^\"]*\"|\'[^\']*\'           { yylval.str = strdup(yytext); return OBJECT_STR; } /* Обработка разных значений переменных */
 
-.                               { 
-                                    int pos = yycolumn; /* Нужно тестирование */
+.                               {
                                     yyerror("Unrecognized symbol");
-                                    fprintf(stderr, "Unrecognized symbol '%s' in line %d, position %d\n", yytext, yylineno, pos);
+                                    fprintf(stderr, "Unrecognized symbol '%s' in line %d\n", yytext, yylineno);
                                 }
 
 %%

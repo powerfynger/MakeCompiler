@@ -3,10 +3,18 @@
 #include <stdlib.h>
 
 int yyparse();
+int yyerror(const char *s);
 extern int yylex();
 extern FILE* yyin;
-
+extern int yylineno;
 %}
+
+%define parse.error detailed
+
+%union 
+{
+    char* str;
+}
 
 %token OBJECT_NAME OBJECT_STR OBJECT_SPECIAL AUTOMATIC FILE_NAME PATH
 %token IFEQ IFNEQ ELSE ENDIF IFDEF IFNDEF ENDEF
@@ -41,6 +49,8 @@ line:
 
 // ---------------------- TARGETS ------------------------
 target:     
+            targetVar ENDL
+            |
             targetVar prerequisite ENDL
             |
             targetVar prerequisite ';' ENDL
@@ -338,6 +348,7 @@ atomic:
             ;
 
 %%
+#define DEFAULT_ERROR -1
 
 int main(int argc, char* argv[])
 {
@@ -355,11 +366,12 @@ int main(int argc, char* argv[])
     yyin = inputFile;
     yyparse();
     fclose(yyin);
+    printf("[+] Analysis is completed successfully.\n");
 }
 
 int yyerror(const char *s)
 {  
-    fprintf(stderr, "\n[-] Line %u: error - %s", yyline, s);
-    fprintf(stderr, "\nProgram finished analysis\n");
+    fprintf(stderr, "[-] Line %u: error - %s\n", yylineno, s);
+    fprintf(stderr, "[!] Finished.\n");
     exit(0);
 }

@@ -15,6 +15,6 @@ clean:
 run:
 	$(YACC) -d $(PARSER_FILE)
 	$(LEX) $(FLEX_FILE)
-	$(CC) lex.yy.c parser.tab.c -lm -o ./build/maker
+	$(CC) lex.yy.c MakeParser.tab.c -lm -o ./build/maker
 
 all: clean run
