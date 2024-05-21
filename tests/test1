@@ -2,7 +2,7 @@ all:
 	gcc -Wall -g -o elfloader elf_loader.c main.c wheelc/list.c -ldl -lm -lpthread
 
 clean:
-	rm -rf f.o wheelc/f.o elfloader
+	rm -rf *.o wheelc/*.o elfloader
 
 #
 # This file is part of John the Ripper password cracker,

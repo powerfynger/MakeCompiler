@@ -7,6 +7,8 @@ int yyerror(const char *s);
 extern int yylex();
 extern FILE* yyin;
 extern int yylineno;
+
+void debugPrint(char* value);
 %}
 
 %define parse.error detailed
@@ -16,27 +18,29 @@ extern int yylineno;
     char* str;
 }
 
-%token OBJECT_NAME OBJECT_STR OBJECT_SPECIAL AUTOMATIC FILE_NAME PATH
+%token AUTOMATIC
 %token IFEQ IFNEQ ELSE ENDIF IFDEF IFNDEF ENDEF
 %token INCLUDE EXPORT DEFINE
 %token ASSIGNMENT
-%token SHELL OBJECT_RECIPIE
+%token SHELL
 %token ENDL
+%token <str> OBJECT_NAME OBJECT_STR OBJECT_SPECIAL FILE_NAME PATH OBJECT_RECIPIE
 
 %start in
 
 %%
 
 in: 
+            line
             | in line
             ;
 
 line: 
             ENDL
             |
-            target
+            target { debugPrint("target"); }
             |
-            recipies
+            recipies { debugPrint("RECEIPT"); }
             |
             variable
             |
@@ -49,7 +53,7 @@ line:
 
 // ---------------------- TARGETS ------------------------
 target:     
-            targetVar ENDL
+            targetVar ENDL { debugPrint("target2"); }
             |
             targetVar prerequisite ENDL
             |
@@ -59,7 +63,7 @@ target:
             ;
 
 targetVar: 
-            targetExpr ':'
+            targetExpr ':' { debugPrint("target3"); }
             |
             targetExpr ':' ':'
             |
@@ -78,9 +82,12 @@ targetExpr:
             ;
 
 targetName: 
-            variableName
+            variableValue
             |
-            OBJECT_NAME
+            OBJECT_NAME { 
+                char temp[256];
+                sprintf(temp, "target Name: %s", (char*)$1);
+                debugPrint(temp); }
             |
             FILE_NAME
             |
@@ -105,7 +112,7 @@ prerequisites:
             ;
 
 prerequisiteName:
-            variableName
+            variableValue
             |
             OBJECT_NAME
             |
@@ -127,13 +134,18 @@ recipies:
             ;
 
 recipiePart:
-            OBJECT_RECIPIE
+            OBJECT_RECIPIE { 
+                char temp[256];
+                sprintf(temp, "recipies: %s", (char*)$1);
+                debugPrint(temp); }
             ;
 // -------------------------------------------------------
 
 // --------------------- VARIABLES -----------------------
 variable: 
-            variableName ASSIGNMENT variableBody ENDL
+            variableName ASSIGNMENT variableBody ENDL { debugPrint("variable"); }
+            |
+            variableName ASSIGNMENT ENDL { debugPrint("variable empty"); }
             |
             EXPORT variable
             |
@@ -374,4 +386,9 @@ int yyerror(const char *s)
     fprintf(stderr, "[-] Line %u: error - %s\n", yylineno, s);
     fprintf(stderr, "[!] Finished.\n");
     exit(0);
+}
+
+void debugPrint(char* value)
+{
+    printf("[DEBUG]: %s\n", value);
 }

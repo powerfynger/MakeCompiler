@@ -1,5 +1,6 @@
 %{
 #include "MakeParser.tab.h"
+#define YYSTYPE unsigned long long
 int yyerror(const char *s);
 %}
 
@@ -9,10 +10,10 @@ int yyerror(const char *s);
 LETTER [[:alpha:]]
 DIGIT [[:digit:]]
 SPEC_CHAR [!@#\^&*()_+=-`~\[\]{};'"\\|,.<>\/?]
-OBJECT_RECIPIE ^(\@[^\@]*\@)?\t[^\n]*      
+OBJECT_RECIPIE \t[^\n]*      
 
 %%
-{OBJECT_RECIPIE}                        { return OBJECT_RECIPIE; }
+{OBJECT_RECIPIE}                        { yylval.str = strdup(yytext); return OBJECT_RECIPIE; }
 
 
 
