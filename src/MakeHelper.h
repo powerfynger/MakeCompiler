@@ -12,3 +12,4 @@ int checkTarget(char* targetName);
 
 void setState(int state);
 void checkState();
+int getState();

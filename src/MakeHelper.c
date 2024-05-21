@@ -48,6 +48,11 @@ void setState(int state)
     currState = state;
 }
 
+int getState()
+{
+    return currState;
+}
+
 void checkState()
 {
     if (currState == 0)
