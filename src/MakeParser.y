@@ -164,9 +164,15 @@ variableBody:
                 debugPrint(temp);
             }
             |
-            OBJECT_STR
+            OBJECT_STR{
+                char temp[256];
+                sprintf(temp, "variableBody: %s", (char*)$1);
+                debugPrint(temp);
+            }
             |
-            FILE_NAME
+            FILE_NAME {char temp[256];
+                sprintf(temp, "ariableBody: %s", (char*)$1);
+                debugPrint(temp);}
             |
             PATH
             |

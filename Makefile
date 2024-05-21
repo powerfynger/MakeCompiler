@@ -2,9 +2,11 @@ CC = gcc
 LEX = flex
 YACC = bison
 MOVE = mv
+
 objects = "as"\
 "asd"\
 "a"
+
 PARSER_FILE = ./src/MakeParser.y
 FLEX_FILE = ./src/MakeLexer.l
 RESULT_FILES = ./build/lex.yy.c ./build/MakeParser.tab.c ./build/MakeParser.tab.h logs.txt ./build/maker

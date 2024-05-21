@@ -1,5 +1,6 @@
 %{
 #include "MakeParser.tab.h"
+#include "MakeHelper.h"
 #define YYSTYPE unsigned long long
 int yyerror(const char *s);
 
@@ -13,12 +14,13 @@ static void UpdateLine();
 
 LETTER [[:alpha:]]
 DIGIT [[:digit:]]
-SPEC_CHAR [!@#\^&*()_+=\-`~\[\]{};'"\\|,<>\/?]
+SPEC_CHAR [.\-*<>!_@`=()\\/]
 OBJECT_RECIPIE \t[^\n]*      
+CONTINUE_LINE (\\\n[ \t]*[^\n]*)* 
 
 %%
-{OBJECT_RECIPIE}                            { yylval.str = strdup(yytext); return OBJECT_RECIPIE; }
-{OBJECT_RECIPIE}(\\\n[ \t]*[^\n]*)*         { UpdateLine(); yylval.str = strdup(yytext); return OBJECT_RECIPIE;}
+{OBJECT_RECIPIE}                            { yylval.str = strdup(yytext); return OBJECT_RECIPIE; }  /* SPEC_CHAR [!@#\^&*()_+=\-`~\[\]{};'"\\\|,<>\/?] */
+{OBJECT_RECIPIE}{CONTINUE_LINE}         {  UpdateLine(); yylval.str = strdup(yytext); return OBJECT_RECIPIE;}
 
 
 
@@ -27,8 +29,8 @@ OBJECT_RECIPIE \t[^\n]*
 [(){}[\]$\-+"\|/&<>`!?,:;]       { return *yytext; }
 \$[@%\<?^+*]                     { return AUTOMATIC; }
 
-\n              { return ENDL; }
-[ \t]+\n        { return ENDL; }
+\n              { ++g_line_amt; return ENDL; }
+[ \t]+\n        { ++g_line_amt;return ENDL; }
 
 ^"ifdef"                         { return IFDEF; } /* Обработка условных операторов */
 ^"ifndef"                        { return IFNDEF; }
@@ -46,8 +48,8 @@ OBJECT_RECIPIE \t[^\n]*
 
 ^"include"                      { return INCLUDE; }
 
-\"[^\"]*\"|\'[^\']*\'           { yylval.str = strdup(yytext); return OBJECT_STR; } /* Обработка разных значений переменных */
-"::="|[":!?+"]?"="                { return ASSIGNMENT; }
+\"[^\"]*\"{CONTINUE_LINE}|\'[^\']*\'{CONTINUE_LINE}           { UpdateLine(); yylval.str = strdup(yytext); return OBJECT_STR; } /* Обработка разных значений переменных */
+"::="|[":!?+"]?"="              { return ASSIGNMENT; }
 
 \/({LETTER}|{DIGIT}|{SPEC_CHAR})+(\/({LETTER}|{DIGIT}|{SPEC_CHAR})+)+               { yylval.str = strdup(yytext); return PATH; } /* Обработка абсолютного пути для Unix */
 
@@ -55,16 +57,18 @@ OBJECT_RECIPIE \t[^\n]*
 
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+(\/({LETTER}|{DIGIT}|{SPEC_CHAR})+)+                 { yylval.str = strdup(yytext); return PATH; } /* Обработка относительного пути для Windows */
 
-({LETTER}|{DIGIT}|{SPEC_CHAR})+  { yylval.str = strdup(yytext); return OBJECT_NAME; } /* Обработка имён целей, файлов, путей к файлам */
+({LETTER}|{DIGIT}|{SPEC_CHAR})+"."({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}  { UpdateLine(); yylval.str = strdup(yytext); return FILE_NAME; }
+
+({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}   { UpdateLine(); yylval.str = strdup(yytext); return OBJECT_NAME; } /* Обработка имён целей, файлов, путей к файлам */
 
 ^"."(({LETTER}|{SPEC_CHAR})+)    { yylval.str = strdup(yytext); return OBJECT_SPECIAL; } /* Обработка специальных целей; TODO: В .y добавить проверку на существование заданной спец. цели */
 
 \%({LETTER}|{DIGIT}|{SPEC_CHAR})*    { yylval.str = strdup(yytext); return OBJECT_NAME; }
 
-({LETTER}|{DIGIT}|{SPEC_CHAR}|".")+ { yylval.str = strdup(yytext); return FILE_NAME; }
 
 {LETTER}{DIGIT}?:\\({LETTER}|{DIGIT}|{SPEC_CHAR})+\\({LETTER}|{DIGIT}|{SPEC_CHAR})+ { yylval.str = strdup(yytext); return PATH; } /* Обработка абсолютного пути для Windows */
 
+\\[\r]?\n[ \t]*                                                             { ++g_line_amt;}
 
 
 \$\((shell[^)]*\))                { return SHELL; } /* Обработка команд шелл-оболочки https://www.gnu.org/software/make/manual/html_node/Shell-Function.html */

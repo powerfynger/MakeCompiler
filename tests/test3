@@ -78,7 +78,7 @@ utils.o : defs.h
 
 .PHONY : clean
 clean :
-        rm edit $(objects)
+	rm edit $(objects)
 
 # 2.6 Another Style of Makefile
 
@@ -86,7 +86,7 @@ objects = main.o kbd.o command.o display.o \
           insert.o search.o files.o utils.o
 
 edit : $(objects)
-        cc -o edit $(objects)
+	cc -o edit $(objects)
 
 $(objects) : defs.h
 kbd.o command.o files.o : command.h
@@ -95,11 +95,11 @@ display.o insert.o search.o files.o : buffer.h
 # 2.7 Rules for Cleaning the Directory
 
 clean:
-        rm edit $(objects)
+	rm edit $(objects)
 
 .PHONY : clean
 clean :
-        -rm edit $(objects)
+	-rm edit $(objects)
 
 # 3.1.1 Splitting Long Lines
 
