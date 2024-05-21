@@ -2,6 +2,10 @@
 #include "MakeParser.tab.h"
 #define YYSTYPE unsigned long long
 int yyerror(const char *s);
+
+unsigned int g_line_amt = 0;
+static void UpdateLine();
+
 %}
 
 %option yylineno
@@ -9,11 +13,12 @@ int yyerror(const char *s);
 
 LETTER [[:alpha:]]
 DIGIT [[:digit:]]
-SPEC_CHAR [!@#\^&*()_+=-`~\[\]{};'"\\|,<>\/?]
+SPEC_CHAR [!@#\^&*()_+=\-`~\[\]{};'"\\|,<>\/?]
 OBJECT_RECIPIE \t[^\n]*      
 
 %%
-{OBJECT_RECIPIE}                        { yylval.str = strdup(yytext); return OBJECT_RECIPIE; }
+{OBJECT_RECIPIE}                            { yylval.str = strdup(yytext); return OBJECT_RECIPIE; }
+{OBJECT_RECIPIE}(\\\n[ \t]*[^\n]*)*         { UpdateLine(); yylval.str = strdup(yytext); return OBJECT_RECIPIE;}
 
 
 
@@ -52,7 +57,7 @@ OBJECT_RECIPIE \t[^\n]*
 
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+  { yylval.str = strdup(yytext); return OBJECT_NAME; } /* Обработка имён целей, файлов, путей к файлам */
 
-^"."(({LETTER}|{SPEC_CHAR})+)    { return OBJECT_SPECIAL; } /* Обработка специальных целей; TODO: В .y добавить проверку на существование заданной спец. цели */
+^"."(({LETTER}|{SPEC_CHAR})+)    { yylval.str = strdup(yytext); return OBJECT_SPECIAL; } /* Обработка специальных целей; TODO: В .y добавить проверку на существование заданной спец. цели */
 
 \%({LETTER}|{DIGIT}|{SPEC_CHAR})*    { yylval.str = strdup(yytext); return OBJECT_NAME; }
 
@@ -73,3 +78,19 @@ OBJECT_RECIPIE \t[^\n]*
                                 }
 
 %%
+
+static void UpdateLine() {
+    int line = g_line_amt;
+    char *p = yytext + strlen(yytext) - 1;
+    while (p >= yytext && *p == '\n') {
+        p--;
+    }
+    while (p >= yytext && *p == '\\' && *(p - 1) == '\n') {
+        p -= 2;
+    }
+    while (p >= yytext && *p == '\n') {
+        line++;
+        p--;
+    }
+    g_line_amt = line;
+}
