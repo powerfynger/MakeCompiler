@@ -52,6 +52,8 @@ line:
 target:     
             targetVar ENDL
             |
+            targetVar ';' ENDL
+            |
             targetVar prerequisite ENDL
             |
             targetVar prerequisite ';' ENDL
@@ -60,15 +62,21 @@ target:
             ;
 
 targetVar: 
-            targetName ':'
+            targetExpr ':'
             |
-            targetName ':' ':'
+            targetExpr ':' ':'
             |
             OBJECT_SPECIAL ':'
             |
             OBJECT_SPECIAL '+' '='
             |
             OBJECT_SPECIAL '='
+            ;
+
+targetExpr:
+            targetExpr targetName
+            |
+            targetName
             ;
 
 targetName: 
@@ -319,10 +327,16 @@ arg:
 
 // ---------------------- INCLUDE ------------------------
 include:
-            INCLUDE filenames // Включение/исключение make-файлов в глубину
+            INCLUDE filenames ENDL // Включение/исключение make-файлов в глубину
             ;
 
-filenames: 
+filenames:
+            filenames filename
+            |
+            filename
+            ;
+
+filename: 
             variableValue
             |
             OBJECT_NAME

@@ -126,10 +126,11 @@ Makefile:: ;
 # 3.6 Overriding Part of Another Makefile
 
 foo:
-        frobnicate > foo
+	frobnicate > foo
 
 %: force
-        @$(MAKE) -f Makefile $@
+	@$(MAKE) -f Makefile $@
+
 force: ;
 
 # 3.7 How make Reads a Makefile
