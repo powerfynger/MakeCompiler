@@ -19,18 +19,19 @@ OBJECT_RECIPIE \t[^\n]*
 
 %%
 {OBJECT_RECIPIE}                    { yylval.str = strdup(yytext); return OBJECT_RECIPIE; }  /* SPEC_CHAR [!@#\^&*()_+=\-`~\[\]{};'"\\\|,<>\/?] */
-{OBJECT_RECIPIE}                    { skipLines(); yylval.str = strdup(yytext); return OBJECT_RECIPIE;}
+{OBJECT_RECIPIE}{CONTINUE_LINE}                    { skipLines(); yylval.str = strdup(yytext); return OBJECT_RECIPIE;}
 
 
 
 \#.*       {} /* Обработка комментариев */
 
-\$\$?[@%\<?^+*]                     { return AUTOMATIC; }
+\$\$?\(?[@%\<?^+*][DF]?\)?          { yylval.str = strdup(yytext); /*return AUTOMATIC;*/ }
 [(){}[\]$\-+"\|/&\<>`!?,:;]         { return *yytext; }
 
 \n                                  { ++currLine; return ENDL; }
 [ \t]+\n                            { ++currLine; return ENDL; }
 
+^"vpath".*
 ^"ifdef"                            { return IFDEF; } /* Обработка условных операторов */
 ^"ifndef"                           { return IFNDEF; }
 ^"endef"                            { return ENDEF; }
@@ -46,12 +47,31 @@ OBJECT_RECIPIE \t[^\n]*
 ^"define"                           { return DEFINE; }
 ^"include"                          { return INCLUDE; }
 
-\$\(                                {   
-                                        char* text = NULL;
-                                        parseFunction(&text);
-                                        yylval.str = text; 
-                                        return OBJECT_NAME;
+\$\$?\(("foreach"|"wildcard"|"patsubst"|"addprefix"|"subst"|"patsubst"|"strip"|"findstring") {   
+                                      char* text = NULL;
+                                      parseFunction(&text);
+                                      yylval.str = text;
+                                      return FUNC;
                                     }
+\$\$?\(("filter"|"filter-out"|"sort"|"word"|"words"|"wordlist"|"firstword"|"lastword"|"dir") {   
+                                      char* text = NULL;
+                                      parseFunction(&text);
+                                      yylval.str = text;
+                                      return FUNC;
+                                    }
+\$\$?\(("notdir"|"suffix"|"basename"|"addsuffix"|"join"|"realpath"|"abspath"|"origin"|"flavor") {   
+                                      char* text = NULL;
+                                      parseFunction(&text);
+                                      yylval.str = text;
+                                      return FUNC;
+                                    }
+\$\$?\(("let"|"if"|"or"|"and"|"intcmp"|"call"|"eval"|"file"|"value"|"shell") {   
+                                      char* text = NULL;
+                                      parseFunction(&text);
+                                      yylval.str = text;
+                                      return FUNC;
+                                    }
+\$\$?\(("error"|"warning")             {}
 
 \"[^\"]*\"{CONTINUE_LINE}|\'[^\']*\'{CONTINUE_LINE}           { skipLines(); yylval.str = strdup(yytext); return OBJECT_STR; } /* Обработка разных значений переменных */
 
@@ -75,8 +95,6 @@ OBJECT_RECIPIE \t[^\n]*
 {LETTER}{DIGIT}?:\\({LETTER}|{DIGIT}|{SPEC_CHAR})+\\({LETTER}|{DIGIT}|{SPEC_CHAR})+ { yylval.str = strdup(yytext); return PATH; } /* Обработка абсолютного пути для Windows */
 
 \\[\r]?\n[ \t]*                     { ++currLine; }
-
-\$\((shell[^)]*\))                  { return SHELL; }
 
 [ \t]                               ;
 .                                   { yyerror("Unrecognized symbol"); }

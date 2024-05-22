@@ -16,13 +16,13 @@ void debugPrint(char* value);
     char* str;
 }
 
-%token AUTOMATIC FUNC
+%token FUNC
 %token IFEQ IFNEQ ELSE ENDIF IFDEF IFNDEF ENDEF
 %token INCLUDE EXPORT DEFINE
 %token ASSIGNMENT
 %token SHELL
 %token ENDL
-%token <str> OBJECT_NAME OBJECT_STR OBJECT_SPECIAL FILE_NAME PATH OBJECT_RECIPIE
+%token <str> OBJECT_NAME OBJECT_STR OBJECT_SPECIAL FILE_NAME PATH OBJECT_RECIPIE AUTOMATIC
 
 %start in
 
@@ -82,6 +82,8 @@ targetVar:
 targetExpr:
             targetExpr targetName
             |
+            targetExpr targetName '&' // Rules with Grouped Targets
+            |
             targetName
             ;
 
@@ -94,6 +96,8 @@ targetName:
             |
             PATH { addTarget((char*)$1); }
             |
+            targetName '/' OBJECT_NAME
+            |
             AUTOMATIC {
                 yyerror("automatic variable in target");
             }
@@ -105,9 +109,13 @@ prerequisite:
             prerequisites
             ;
 
-            // Для учета множественных зависимостей
+            // Для учета множественных prerequisites
 prerequisites:
             prerequisites prerequisiteName
+            |
+            prerequisites '|' prerequisiteName // Предварительные условия "только для заказа"
+            |
+            '|' prerequisiteName
             |
             prerequisiteName
             ;
