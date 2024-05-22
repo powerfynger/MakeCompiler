@@ -16,7 +16,7 @@ void debugPrint(char* value);
     char* str;
 }
 
-%token AUTOMATIC
+%token AUTOMATIC FUNC
 %token IFEQ IFNEQ ELSE ENDIF IFDEF IFNDEF ENDEF
 %token INCLUDE EXPORT DEFINE
 %token ASSIGNMENT
@@ -46,6 +46,10 @@ line:
             define
             |
             condition
+            |
+            atomic ENDL {
+                yyerror("an atomic object outside the expression");
+            }
             ;
 
 // ---------------------- TARGETS ------------------------
@@ -60,7 +64,7 @@ target:
             |
             targetVar prerequisite ';' atomics ENDL
             |
-            targetVar prerequisite ASSIGNMENT targetExpr ENDL
+            targetVar variable
             ;
 
 targetVar: 
@@ -117,9 +121,9 @@ prerequisiteName:
             |
             PATH
             |
-            AUTOMATIC {
-                yyerror("automatic variable in prerequisite");
-            }
+            FUNC
+            |
+            AUTOMATIC
             ;
 // -------------------------------------------------------
 
@@ -131,10 +135,7 @@ recipies:
             ;
 
 recipiePart:
-            OBJECT_RECIPIE { 
-                char temp[256];
-                sprintf(temp, "recipies: %s", (char*)$1);
-                debugPrint(temp); }
+            OBJECT_RECIPIE
             ;
 // -------------------------------------------------------
 
@@ -154,13 +155,9 @@ variable:
 variableName:
             OBJECT_NAME { addVariable((char*)$1); }
             |
-            FILE_NAME {
-                yyerror("filename in variable name");
-            }
+            FILE_NAME
             |
-            PATH {
-                yyerror("path in variable name");
-            }
+            PATH
             |
             AUTOMATIC {
                 yyerror("automatic variable in variable name");
@@ -168,29 +165,27 @@ variableName:
             ;
 
 variableBody:
-            OBJECT_NAME { 
-                char temp[256];
+            OBJECT_NAME {
+                char temp[512];
                 sprintf(temp, "variableBody: %s", (char*)$1);
                 debugPrint(temp);
             }
             |
-            OBJECT_STR {
-                char temp[256];
-                sprintf(temp, "variableBody: %s", (char*)$1);
-                debugPrint(temp);
-            }
+            OBJECT_STR 
             |
-            FILE_NAME {char temp[256];
-                sprintf(temp, "variableBody: %s", (char*)$1);
-                debugPrint(temp);}
+            FILE_NAME
             |
             PATH
             |
-            variableBody OBJECT_NAME
+            variablePart
+            |
+            variableBody variablePart
+            |
+            variableBody OBJECT_NAME 
             |
             variableBody OBJECT_STR
             |
-            variableBody FILE_NAME
+            variableBody FILE_NAME 
             |
             variableBody PATH
             |
@@ -203,14 +198,14 @@ variableBody:
             variableBody '{' variableBody '}'
             |
             variableBody ','
-            |
-            variablePart
-            |
-            variableBody variablePart
             ;
 
 variablePart:
+            FUNC
+            |
             SHELL
+            |
+            AUTOMATIC
             |
             ASSIGNMENT
             |
@@ -221,7 +216,7 @@ variablePart:
 
             // Символы, которые могут встретиться в variableBody (например, -name; остальные - bash, cmd?)
 variableSigns:
-            '-' | '+' | ':' | '&' | '>' | '<' | '[' | ']' | ';' | '/'
+            '-' | '+' | ':' | '&' | '>' | '<' | '[' | ']' | ';' | '/' | '|'
             ;
 
 variableValue:
@@ -277,6 +272,8 @@ defineBody:
             |
             SHELL
             |
+            FUNC
+            |
             OBJECT_NAME
             |
             AUTOMATIC
@@ -291,7 +288,7 @@ defineBody:
             ;
 
 defineSigns:
-            '-' | '+' | ':' | '&' | '>' | '<' | '[' | ']' | ';' | '/'
+            '-' | '+' | ':' | '&' | '>' | '<' | '[' | ']' | ';' | '/' | '|'
             ;
 // -------------------------------------------------------
 
@@ -330,6 +327,8 @@ arg:
             atomic
             |
             OBJECT_STR
+            |
+            FUNC
             ;
 // -------------------------------------------------------
 
@@ -399,7 +398,7 @@ int main(int argc, char* argv[])
 
 int yyerror(const char *s)
 {  
-    fprintf(stderr, "[-] Line %u: error - %s\n", yylineno, s);
+    fprintf(stderr, "[Line %u] Error: %s\n", yylineno, s);
     fprintf(stderr, "[!] Finished.\n");
     exit(0);
 }

@@ -140,7 +140,6 @@ immediate ?= deferred
 immediate := immediate
 immediate ::= immediate
 immediate :::= immediate-with-escape
-immediate += deferred or immediate
 immediate != immediate
 
 define immediate
@@ -167,22 +166,11 @@ define immediate :::=
   immediate-with-escape
 endef
 
-define immediate +=
-  deferred or immediate
-endef
-
 define immediate !=
   immediate
 endef
 
 # 3.8 How Makefiles Are Parsed
-
-define myrule
-	target:
-        echo built
-endef
-
-$(myrule)
 
 # 3.9 Secondary Expansion
 
@@ -225,8 +213,6 @@ foo: foo.3 bar.3 $$< $$^ $$+    # line #3
 
 foo: bar
 
-foo foz: fo%: bo%
-
 %oo: $$< $$^ $$+ $$*
 
 .SECONDEXPANSION:
@@ -234,7 +220,7 @@ foo foz: fo%: bo%
 /tmp/foo.o:
 
 %.o: $$(addsuffix /%.c,foo bar) foo.h
-        @echo $^
+	@echo $^
 
 # 4.1 Rule Example
 
@@ -244,10 +230,10 @@ foo.o : foo.c defs.h
 # 4.2 Rule Syntax
 
 targets : prerequisites
-    recipe
+	recipe
 
 targets : prerequisites ; recipe
-    recipe
+	recipe
 
 # 4.3 Types of Prerequisites
 targets : normal-prerequisites | order-only-prerequisites

@@ -74,6 +74,7 @@ OPT_INLINE = -Os -funroll-loops -finline-functions
 PLUGFORMATS_SRCS: sh = echo *_plug.c
 PLUGFORMATS_SRCS += $(wildcard *_plug.c)
 PLUGFORMATS_OBJS = $(PLUGFORMATS_SRCS:.c=.o)
+PLUGFORMATS_OBJS = $(OPT_INLINE)
 
 JOHN_OBJS = \
 	$(MPIOBJ) \

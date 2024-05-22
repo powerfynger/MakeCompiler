@@ -14,7 +14,7 @@ void addTarget(char* targetName)
     else if (targetCount % DEFAULT_TARGETS_ADD == 0)
         targetList = (char**)realloc(targetList, sizeof(char*) * DEFAULT_TARGETS_ADD);
     targetList[targetCount] = targetName;
-    printf("New target: %s\n", targetList[targetCount]);
+    //printf("New target: %s\n", targetList[targetCount]);
     targetCount++;
 }
 
@@ -25,7 +25,7 @@ void addVariable(char* varName)
     else if (variableCount % DEFAULT_VARS_ADD == 0)
         variableList = (char**)realloc(variableList, sizeof(char*) * DEFAULT_VARS_ADD);
     variableList[variableCount] = varName;
-    printf("New var: %s\n", variableList[variableCount]);
+    //printf("New var: %s\n", variableList[variableCount]);
     variableCount++;
 }
 

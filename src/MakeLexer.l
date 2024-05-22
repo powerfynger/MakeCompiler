@@ -3,12 +3,9 @@
 #include "MakeHelper.h"
 #define YYSTYPE unsigned long long
 int yyerror(const char *s);
-
 unsigned int currLine = 1;
 static void skipLines();
-static void parseFunction(char **text)
-
-
+static void parseFunction(char **text);
 %}
 
 %option yylineno
@@ -16,50 +13,49 @@ static void parseFunction(char **text)
 
 LETTER [[:alpha:]]
 DIGIT [[:digit:]]
-SPEC_CHAR [.\-*<>!_@`\\/+]
+SPEC_CHAR [.\-*\<>!_@`\\/+]
 CONTINUE_LINE (\\\n[ \t]*[^\n]*)* 
 OBJECT_RECIPIE \t[^\n]*      
 
 %%
-{OBJECT_RECIPIE}                            { yylval.str = strdup(yytext); return OBJECT_RECIPIE; }  /* SPEC_CHAR [!@#\^&*()_+=\-`~\[\]{};'"\\\|,<>\/?] */
-{OBJECT_RECIPIE}                            { skipLines(); yylval.str = strdup(yytext); return OBJECT_RECIPIE;}
+{OBJECT_RECIPIE}                    { yylval.str = strdup(yytext); return OBJECT_RECIPIE; }  /* SPEC_CHAR [!@#\^&*()_+=\-`~\[\]{};'"\\\|,<>\/?] */
+{OBJECT_RECIPIE}                    { skipLines(); yylval.str = strdup(yytext); return OBJECT_RECIPIE;}
 
 
 
 \#.*       {} /* Обработка комментариев */
 
-[(){}[\]$\-+"\|/&<>`!?,:;]       { return *yytext; }
-\$[@%\<?^+*]                     { return AUTOMATIC; }
+\$\$?[@%\<?^+*]                     { return AUTOMATIC; }
+[(){}[\]$\-+"\|/&\<>`!?,:;]         { return *yytext; }
 
-\n              { ++currLine; return ENDL; }
-[ \t]+\n        { ++currLine;return ENDL; }
+\n                                  { ++currLine; return ENDL; }
+[ \t]+\n                            { ++currLine; return ENDL; }
 
-^"ifdef"                         { return IFDEF; } /* Обработка условных операторов */
-^"ifndef"                        { return IFNDEF; }
-^"endef"                         { return ENDEF; }
-^"ifeq"                          { return IFEQ; }
-^"ifneq"                         { return IFNEQ; }
-^"else"                          { return ELSE; }
-^"endif"                         { return ENDIF; }
+^"ifdef"                            { return IFDEF; } /* Обработка условных операторов */
+^"ifndef"                           { return IFNDEF; }
+^"endef"                            { return ENDEF; }
+^"ifeq"                             { return IFEQ; }
+^"ifneq"                            { return IFNEQ; }
+^"else"                             { return ELSE; }
+^"endif"                            { return ENDIF; }
 
-^"unexport"                      { return EXPORT; }
-^"export"                        { return EXPORT; }
-^"override"                      { return EXPORT; }
+^"unexport"                         { return EXPORT; }
+^"export"                           { return EXPORT; }
+^"override"                         { return EXPORT; }
 
-^"define"                        { return DEFINE; }
+^"define"                           { return DEFINE; }
+^"include"                          { return INCLUDE; }
 
-^"include"                       { return INCLUDE; }
-
-$\(                        
-    { 
-    char *text = NULL;
-    parseFunction(&text);
-    yylval.str = text; 
-    return FUNCTION;
-    }
+\$\(                                {   
+                                        char* text = NULL;
+                                        parseFunction(&text);
+                                        yylval.str = text; 
+                                        return OBJECT_NAME;
+                                    }
 
 \"[^\"]*\"{CONTINUE_LINE}|\'[^\']*\'{CONTINUE_LINE}           { skipLines(); yylval.str = strdup(yytext); return OBJECT_STR; } /* Обработка разных значений переменных */
-"::="|":::="|[":!?+"]?"="              { return ASSIGNMENT; }
+
+"::="|":::="|[":!?+"]?"="           { return ASSIGNMENT; }
 
 \/({LETTER}|{DIGIT}|{SPEC_CHAR})+(\/({LETTER}|{DIGIT}|{SPEC_CHAR})+)+               { yylval.str = strdup(yytext); return PATH; } /* Обработка абсолютного пути для Unix */
 
@@ -78,21 +74,14 @@ $\(
 
 {LETTER}{DIGIT}?:\\({LETTER}|{DIGIT}|{SPEC_CHAR})+\\({LETTER}|{DIGIT}|{SPEC_CHAR})+ { yylval.str = strdup(yytext); return PATH; } /* Обработка абсолютного пути для Windows */
 
-\\[\r]?\n[ \t]*                                                             { ++currLine;}
+\\[\r]?\n[ \t]*                     { ++currLine; }
 
+\$\((shell[^)]*\))                  { return SHELL; }
 
-\$\((shell[^)]*\))                { return SHELL; } /* Обработка команд шелл-оболочки https://www.gnu.org/software/make/manual/html_node/Shell-Function.html */
-
-
-
-[ \t]
-.                               {
-                                    yyerror("Unrecognized symbol");
-                                    fprintf(stderr, "Unrecognized symbol '%s' in line %d\n", yytext, yylineno);
-                                }
+[ \t]                               ;
+.                                   { yyerror("Unrecognized symbol"); }
 
 %%
-
 
 static void parseFunction(char **text)
 {
@@ -125,7 +114,7 @@ static void parseFunction(char **text)
             {
                 if (prev == '\\')
                 {
-                    ++g_line_amt;
+                    ++currLine;
                     *text = realloc(*text, len + 3);
                     (*text)[len++] = '\\'; 
                     (*text)[len++] = '\n'; 
@@ -145,7 +134,8 @@ static void parseFunction(char **text)
     }
 }
 
-static void skipLines() {
+static void skipLines() 
+{
     int line = currLine;
     // printf("Line: %d\n", line);
 

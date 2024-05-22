@@ -203,7 +203,7 @@ MAINT := @MAINT@
 # be used in language Make-lang.in makefile fragments to enable
 # maintainer rules.  So, ENABLE_MAINTAINER_RULES is 'true' in
 # maintainer mode, and '' otherwise.
-@MAINT@ ENABLE_MAINTAINER_RULES = true
+#@MAINT@ ENABLE_MAINTAINER_RULES = true
 
 # These are set by --enable-checking=valgrind.
 RUN_GEN = @valgrind_command@
@@ -365,7 +365,7 @@ STAMP = echo timestamp >
 build_file_translate = @build_file_translate@
 
 # Make sure the $(MAKE) variable is defined.
-@SET_MAKE@
+# @SET_MAKE@
 
 # Locate mkinstalldirs.
 mkinstalldirs=$(SHELL) $(srcdir)/../mkinstalldirs
