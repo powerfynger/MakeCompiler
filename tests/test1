@@ -213,8 +213,8 @@ VALGRIND_DRIVER_DEFINES = @valgrind_path_defines@
 .-warn = $(STRICT_WARN)
 build-warn = $(STRICT_WARN)
 rtl-ssa-warn = $(STRICT_WARN)
-GCC_WARN_CFLAGS = $(LOOSE_WARN) $(C_LOOSE_WARN) $($(@D)-warn) $(if $(filter-out $(STRICT_WARN),$($(@D)-warn)),,$(C_STRICT_WARN)) $(NOCOMMON_FLAG) $($@-warn)
-GCC_WARN_CXXFLAGS = $(LOOSE_WARN) $($(@D)-warn) $(NOCOMMON_FLAG) $($@-warn)
+# GCC_WARN_CFLAGS = $(LOOSE_WARN) $(C_LOOSE_WARN) $($(@D)-warn) $(if $(filter-out $(STRICT_WARN),$($(@D)-warn)),,$(C_STRICT_WARN)) $(NOCOMMON_FLAG) $($@-warn)
+GCC_WARN_CXXFLAGS = $(LOOSE_WARN) $($(@D)-warn)
 
 # 1 2 3 ... 9999
 one_to_9999_0:=1 2 3 4 5 6 7 8 9
@@ -547,8 +547,8 @@ STRIP_FOR_TARGET := $(shell \
 # Where to find some libiberty headers.
 HASHTAB_H   = $(srcdir)/../include/hashtab.h
 OBSTACK_H   = $(srcdir)/../include/obstack.h
-SPLAY_TREE_H= $(srcdir)/../include/splay-tree.h
-MD5_H	    = $(srcdir)/../include/md5.h
+SPLAY_TREE_H = $(srcdir)/../include/splay-tree.h
+MD5_H       = $(srcdir)/../include/md5.h
 XREGEX_H    = $(srcdir)/../include/xregex.h
 FNMATCH_H   = $(srcdir)/../include/fnmatch.h
 
@@ -558,7 +558,7 @@ LINKER_PLUGIN_API_H = $(srcdir)/../include/plugin-api.h
 # Default native SYSTEM_HEADER_DIR, to be overridden by targets.
 NATIVE_SYSTEM_HEADER_DIR = @NATIVE_SYSTEM_HEADER_DIR@
 # Default cross SYSTEM_HEADER_DIR, to be overridden by targets.
-ifeq (@includedir@,$(prefix)/include)
+ifeq (@includedir@,$(prefix))
   CROSS_SYSTEM_HEADER_DIR = @CROSS_SYSTEM_HEADER_DIR@
 else
   CROSS_SYSTEM_HEADER_DIR = @includedir@
@@ -633,12 +633,7 @@ with_float = @with_float@
 ifeq ($(enable_multiarch),yes)
   if_multiarch = $(1)
 else
-  ifeq ($(enable_multiarch),auto)
-    # SYSTEM_HEADER_DIR is makefile syntax, cannot be evaluated in configure.ac
-    if_multiarch = $(if $(wildcard $(shell echo $(BUILD_SYSTEM_HEADER_DIR))/../../usr/lib/*/crti.o),$(1))
-  else
-    if_multiarch =
-  endif
+  
 endif
 
 # ------------------------
@@ -790,13 +785,13 @@ EXTRA_OBJS = @extra_objs@
 
 # List of extra object files that should be compiled and linked with
 # the gcc driver.
-EXTRA_GCC_OBJS =@extra_gcc_objs@
+EXTRA_GCC_OBJS = @extra_gcc_objs@
 
 # List of extra libraries that should be linked with the gcc driver.
 EXTRA_GCC_LIBS = @EXTRA_GCC_LIBS@
 
 # List of additional header files to install.
-EXTRA_HEADERS =@extra_headers_list@
+EXTRA_HEADERS = @extra_headers_list@
 
 # How to handle <stdint.h>.
 USE_GCC_STDINT = @use_gcc_stdint@
@@ -891,7 +886,7 @@ OPTIONS_H_EXTRA =
 # the .opt files
 OPTIONS_C_EXTRA = $(PRETTY_PRINT_H)
 
-@option_includes@
+#@option_includes@
 
 # End of variables for you to override.
 

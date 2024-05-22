@@ -254,11 +254,11 @@ $(OBJDIR):
 # 4.4 Using Wildcard Characters in File Names
 # 4.4.1 Wildcard Examples
 clean:
-    rm -f *.o
+	rm -f *.o
 
 print: *.c
-    lpr -p $?
-    touch print
+	lpr -p $?
+	touch print
 
 objects = *.o
 
@@ -268,13 +268,13 @@ objects := $(wildcard *.o)
 objects = *.o
 
 foo : $(objects)
-    vcc -o foo $(CFLAGS) $(objects)
+	vcc -o foo $(CFLAGS) $(objects)
 
 # 4.4.3 The Function wildcard
 objects := $(patsubst %.c,%.o,$(wildcard *.c))
 
 foo : $(objects)
-    cc -o foo $(objects)
+	cc -o foo $(objects)
 
 # 4.5 Searching Directories for Prerequisites
 # 4.5.1 VPATH: Search Path for All Prerequisites
@@ -288,8 +288,8 @@ foo.o : src/foo.c
 
 vpath %.h ../headers
 
-vpath %.c foo 
-vpath % blish 
+vpath %.c foo
+vpath % blish
 vpath %.c bar
 
 vpath %.c foo:bar
@@ -298,30 +298,30 @@ vpath %   blish
 # 4.5.4 Writing Recipes with Directory Search
 
 foo.o : foo.c
-    cc -c $(CFLAGS) $^ -o $@
+	cc -c $(CFLAGS) $^ -o $@
 
 VPATH = src:../headers
 foo.o : foo.c defs.h hack.h
-    cc -c $(CFLAGS) $< -o $@
+	cc -c $(CFLAGS) $< -o $@
 
 # 4.5.6 Directory Search for Link Libraries
 
 foo : foo.c -lcurses
-    cc $^ -o $@
+	cc $^ -o $@
 
 # 4.6 Phony Targets
 
 clean:
-    rm *.o temp
+	rm *.o temp
 
 .PHONY: clean
 clean:
-    rm *.o temp
+	rm *.o temp
 
 SUBDIRS = foo bar baz
 
 subdirs:
-    for dir in $(SUBDIRS); do \
+	for dir in $(SUBDIRS); do \
         $(MAKE) -C $$dir; \
     done
 
@@ -332,7 +332,7 @@ SUBDIRS = foo bar baz
 subdirs: $(SUBDIRS)
 
 $(SUBDIRS):
-    $(MAKE) -C $@
+	$(MAKE) -C $@
 
 foo: baz
 
@@ -340,51 +340,51 @@ all : prog1 prog2 prog3
 .PHONY : all
 
 prog1 : prog1.o utils.o
-        cc -o prog1 prog1.o utils.o
+	cc -o prog1 prog1.o utils.o
 
 prog2 : prog2.o
-        cc -o prog2 prog2.o
+	cc -o prog2 prog2.o
 
 prog3 : prog3.o sort.o utils.o
-        cc -o prog3 prog3.o sort.o utils.o
+	cc -o prog3 prog3.o sort.o utils.o
 
 
 .PHONY: cleanall cleanobj cleandiff
 
 cleanall : cleanobj cleandiff
-    rm program
+	rm program
 
 cleanobj :
-    rm *.o
+	rm *.o
 
 cleandiff :
-    rm *.diff
+	rm *.diff
 
 # 4.7 Rules without Recipes or Prerequisites
 
 clean: FORCE
-    rm $(objects)
+	rm $(objects)
 FORCE:
 
 # 4.8 Empty Target Files to Record Events
 
 print: foo.c bar.c
-    lpr -p $?
-    touch print
+	lpr -p $?
+	touch print
 
 # 4.9 Special Built-in Target Names
 
 hello.bin: hello.o bye.o
-    $(CC) -o $@ $^
+	$(CC) -o $@ $^
 
 %.o: %.c
-    $(CC) -c -o $@ $<
+	$(CC) -c -o $@ $<
 
 .SECONDARY: hello.o bye.o
 
 .LOW_RESOLUTION_TIME: dst
 dst: src
-    cp -p src dst
+	cp -p src dst
 
 # 4.10 Multiple Targets in a Rule
 
@@ -394,12 +394,12 @@ command.o: command.h
 files.o: command.h
 
 bigoutput littleoutput : text.g
-    generate text.g -$(subst output,,$@) > $@
+	generate text.g -$(subst output,,$@) > $@
 
 bigoutput : text.g
-    generate text.g -big > bigoutput
+	generate text.g -big > bigoutput
 littleoutput : text.g
-    generate text.g -little > littleoutput
+	generate text.g -little > littleoutput
 
 # Rules with Grouped Targets
 
