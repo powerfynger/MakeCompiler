@@ -1,0 +1,58 @@
+CC=gcc
+CFLAGS=-Wall 
+APP_PATH=app
+PATH_TO_LIBZ=zlib
+PATH_TO_LIBPNG=libpng
+PATH_TO_FREETYPE=freetype/install/lib
+APP_OBJECTS=Main.o
+BLOBLOADER_OBJECTS=elf.o BlobLoader.o
+BINS=static-file dynamic-file blob.bin
+LIBZ_STATIC=libz.a
+LIBPNG_STATIC=$libpng.a
+FTYPE_STATIC=libfreetype.a
+LIBZ_DYNAMIC=libz.so
+LIBPNG_DYNAMIC=libpng16.so
+FTYPE_DYNAMIC=libfreetype.so
+OUT_FILE_STATIC=static-file
+OUT_FILE_BLOB=app-blob
+
+GOALS: static dynamic blob clean all run all_run
+
+static: 
+	$(MAKE) -C $(APP_PATH) static
+	cd $(APP_PATH) && $(CC) -static $(CFLAGS) $(APP_OBJECTS) \
+	../$(PATH_TO_LIBPNG)/$(LIBPNG_STATIC) ../$(PATH_TO_LIBZ)/$(LIBZ_STATIC) ../$(PATH_TO_FREETYPE)/$(FTYPE_STATIC) \
+	-lm -o ../$(OUT_FILE_STATIC)
+	
+dynamic:
+	$(MAKE) -C $(APP_PATH) dynamic
+		
+clean:
+	rm -f $(BINS)
+	$(MAKE) -C $(APP_PATH) clean 
+blob: 
+	$(MAKE) -C $(APP_PATH) blob
+		
+all: clean static dynamic blob
+
+run: 
+	./dynamic-file text.ttf "ikizi izi" dynamic.png
+	./static-file text.ttf "ikizi izi" static.png
+	./app-blob text.ttf "hello bro how are u ?" blob.png
+
+all_run: all run
+
+# -MD генерация файлов зависимостей .d чтобы при изменении файла происходила перекомпиляция
+# -fno-stack-protector отключение защиты стека, исключает ошибки переполнения стека
+# -pie-fpie произвольное размещение исполняемого кода независимо от его абсолютного адреса (аналогия ASLR)
+# -c Компиляция без вызова компоновщика
+# -o указание имени объекта
+# -fPIC Позволяет подключить исполняемые модули к коду программы в момент ее загрузки
+# -DO_RDONLY -флаг режима открытия файла
+# -shared создается не исполняемый файл,а DLL(.so)
+# -I обрабатывается и посылается компановщику для подключения библиотеки к бинарнику (где находится .h)
+# -static использовать толькостатические версии библиотек
+# -Wall позволяет компилятору выводить все предупреждения
+# -ldl Компоновка с библиотекой libdl
+# -lm подключает математическую библиотеку
+# -D Определять макрос при компиляции а не в программе

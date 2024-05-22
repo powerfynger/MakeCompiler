@@ -438,7 +438,7 @@ $(filter %.elc,$(files)): %.elc: %.el
 	emacs -f batch-byte-compile $<
 
 bigoutput littleoutput : %output : text.g
-    generate text.g -$* > $@
+	generate text.g -$* > $@
 
 # 4.14 Generating Prerequisites Automatically
 
@@ -472,7 +472,7 @@ all :
 	space
 
 
-all : ; @echo 'hello \ # Комманда сразу после зависимостей
+all : ;	@echo 'hello \ # Команда сразу после зависимостей
 	world' ; echo "hello \
 	world"
 
@@ -480,7 +480,7 @@ all : ; @echo 'hello \ # Комманда сразу после зависимо
 HELLO = 'hello \
 world'
 
-all : ; @echo $(HELLO)
+all : ;	@echo $(HELLO)
 
 # 5.1.2 Using Variables in Recipes
 
@@ -527,14 +527,14 @@ show :
 
 .ONESHELL:
 foo : bar/lose
-        @cd $(@D)
-        @gobble $(@F) > ../$@
+	@cd $(@D)
+	@gobble $(@F) > ../$@
 
 # 5.4 Parallel Execution
 # 5.4.1 Disabling Parallel Execution
 
 all: one two three
-one two three: ; @sleep 1; echo $@
+one two three: ;	@sleep 1;	echo $@
 
 .NOTPARALLEL:
 
@@ -543,25 +543,25 @@ all: base notparallel
 base: one two three
 notparallel: one two three
 
-one two three: ; @sleep 1; echo $@
+one two three: ;	@sleep 1;	echo $@
 
 .NOTPARALLEL: notparallel
 
 all: one two .WAIT three
-one two three: ; @sleep 1; echo $@
+one two three: ;	@sleep 1;	echo $@
 
 # 5.7 Recursive Use of make
 
 subsystem:
-        cd subdir && $(MAKE)
+	cd subdir && $(MAKE)
 
 subsystem:
-        $(MAKE) -C subdir
+	$(MAKE) -C subdir
 
 # 5.7.1 How the MAKE Variable Works
 
 subsystem:
-        cd subdir && $(MAKE)
+	cd subdir && $(MAKE)
 
 # 5.7.2 Communicating Variables to a Sub-make
 
@@ -587,12 +587,12 @@ export variable
 # 5.7.3 Communicating Options to a Sub-make
 
 subsystem:
-        cd subdir && $(MAKE) MAKEFLAGS=
+	cd subdir && $(MAKE) MAKEFLAGS=
 
 MAKEOVERRIDES = 
 
 subsystem:
-        cd subdir && $(MAKE) $(MFLAGS)
+	cd subdir && $(MAKE) $(MFLAGS)
 
 # 5.8 Defining Canned Recipes
 
@@ -602,7 +602,7 @@ mv y.tab.c $@
 endef
 
 foo.c : foo.y
-        $(run-yacc)
+	$(run-yacc)
 
 define frobnicate =
 @echo "frobnicating target $@"
@@ -611,7 +611,7 @@ frob-step-2 $@-step-1 -o $@
 endef
 
 frob.out: frob.in
-        @$(frobnicate)
+	@$(frobnicate)
 
 # 5.9 Using Empty Recipes
 
@@ -621,13 +621,13 @@ target: ;
 
 objects = program.o foo.o utils.o
 program : $(objects)
-        cc -o program $(objects)
+	cc -o program $(objects)
 
 $(objects) : defs.h
 
 foo = c
 prog.o : prog.$(foo)
-        $(foo)$(foo) -$(foo) prog.$(foo)
+	$(foo)$(foo) -$(foo) prog.$(foo)
 
 # 6.2.1 Recursively Expanded Variable Assignment
 
@@ -635,7 +635,7 @@ foo = $(bar)
 bar = $(ugh)
 ugh = Huh?
 
-all:;echo $(foo)
+all:;	echo $(foo)
 
 CFLAGS = $(include_dirs) -O
 include_dirs = -Ifoo -Ibar
@@ -658,7 +658,7 @@ MAKE := ${MAKE} host-type=${host-type} whoami=${whoami}
 endif
 
 ${subdirs}:
-        ${MAKE} -C $@ all
+	${MAKE} -C $@ all
 
 nullstring :=
 space := $(nullstring) # end of the line

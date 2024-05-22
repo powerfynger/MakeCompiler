@@ -16,13 +16,11 @@ void debugPrint(char* value);
     char* str;
 }
 
-%token FUNC
 %token IFEQ IFNEQ ELSE ENDIF IFDEF IFNDEF ENDEF
 %token INCLUDE EXPORT DEFINE
 %token ASSIGNMENT
-%token SHELL
 %token ENDL
-%token <str> OBJECT_NAME OBJECT_STR OBJECT_SPECIAL FILE_NAME PATH OBJECT_RECIPIE AUTOMATIC
+%token <str> OBJECT_NAME OBJECT_STR OBJECT_SPECIAL FILE_NAME PATH OBJECT_RECIPIE AUTOMATIC FUNC
 
 %start in
 
@@ -65,6 +63,12 @@ target:
             targetVar prerequisite ';' atomics ENDL
             |
             targetVar variable
+            |
+            targetVar ';' recipies
+            |
+            targetVar prerequisite recipies
+            |
+            targetVar prerequisite ';' recipies
             ;
 
 targetVar: 
@@ -96,6 +100,8 @@ targetName:
             |
             PATH { addTarget((char*)$1); }
             |
+            FUNC { addTarget((char*)$1); }
+            |
             targetName '/' OBJECT_NAME
             |
             AUTOMATIC {
@@ -116,6 +122,8 @@ prerequisites:
             prerequisites '|' prerequisiteName // Предварительные условия "только для заказа"
             |
             '|' prerequisiteName
+            |
+            prerequisites ':' prerequisiteName // Syntax of Static Pattern Rules
             |
             prerequisiteName
             ;
@@ -174,9 +182,9 @@ variableName:
 
 variableBody:
             OBJECT_NAME {
-                char temp[512];
-                sprintf(temp, "variableBody: %s", (char*)$1);
-                debugPrint(temp);
+                // char temp[512];
+                // sprintf(temp, "variableBody: %s", (char*)$1);
+                // debugPrint(temp);
             }
             |
             OBJECT_STR 
@@ -210,8 +218,6 @@ variableBody:
 
 variablePart:
             FUNC
-            |
-            SHELL
             |
             AUTOMATIC
             |
@@ -272,13 +278,17 @@ define:
             ;
 
 defineBody:
+            definePart
+            |
+            defineBody definePart
+            ;
+
+definePart:
             variableValue
             |
             defineSigns
             |
             ASSIGNMENT
-            |
-            SHELL
             |
             FUNC
             |
@@ -401,6 +411,7 @@ int main(int argc, char* argv[])
     yyin = inputFile;
     yyparse();
     fclose(yyin);
+    printStats();
     printf("[+] Analysis is completed successfully.\n");
 }
 

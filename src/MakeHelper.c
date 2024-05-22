@@ -1,5 +1,7 @@
 #include "MakeHelper.h"
 
+extern int yylineno;
+
 char** targetList = NULL;
 int targetSize = 0;
 char** variableList = NULL;
@@ -19,9 +21,12 @@ void addTarget(char* targetName)
         targetList = (char**)realloc(targetList, sizeof(char*) * DEFAULT_TARGETS_ADD * (targetCounts + 1));
         targetCounts++;
     }
-    targetList[targetSize] = targetName;
-    //printf("New target: %s\n", targetList[targetSize]);
-    targetSize++;
+    if (!checkTarget(targetName)) 
+    {
+        targetList[targetSize] = targetName;
+        //printf("New target: %s\n", targetList[targetSize]);
+        targetSize++;
+    }
 }
 
 void addVariable(char* varName)
@@ -33,9 +38,12 @@ void addVariable(char* varName)
         variableList = (char**)realloc(variableList, sizeof(char*) * DEFAULT_VARS_ADD * (variableCounts + 1));
         variableCounts++;
     }
-    variableList[variableSize] = varName;
-    //printf("New var: %s\n", variableList[variableSize]);
-    variableSize++;
+    if (!checkTarget(varName)) 
+    {
+        variableList[variableSize] = varName;
+        //printf("New var: %s\n", variableList[variableSize]);
+        variableSize++;
+    }
 }
 
 int checkTarget(char* targetName)
@@ -44,6 +52,20 @@ int checkTarget(char* targetName)
     for (int i = 0; i < targetSize; i++)
     {
         if (targetName == targetList[i]) 
+        {
+            result = 1;
+            break;
+        }
+    }
+    return result;    
+}
+
+int checkVariable(char* varName)
+{
+    int result = 0;
+    for (int i = 0; i < variableSize; i++)
+    {
+        if (varName == variableList[i]) 
         {
             result = 1;
             break;
@@ -66,4 +88,13 @@ void checkState()
 {
     if (currState == 0)
         yyerror("recipie not in target");
+}
+
+void printStats()
+{
+    printf("Statistics of the analyzed makefile:\n\n"
+           "Lines: %d\n"
+           "Targets: %d\n"
+           "Variables: %d\n\n", 
+           yylineno, targetSize, variableSize);
 }

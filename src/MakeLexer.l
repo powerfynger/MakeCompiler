@@ -1,6 +1,5 @@
 %{
 #include "MakeParser.tab.h"
-#include "MakeHelper.h"
 #define YYSTYPE unsigned long long
 int yyerror(const char *s);
 unsigned int currLine = 1;
@@ -13,13 +12,13 @@ static void parseFunction(char **text);
 
 LETTER [[:alpha:]]
 DIGIT [[:digit:]]
-SPEC_CHAR [.\-*\<>!_@`\\/+]
+SPEC_CHAR [.\-*\<>!_@`\\/+?]
 CONTINUE_LINE (\\\n[ \t]*[^\n]*)* 
 OBJECT_RECIPIE \t[^\n]*      
 
 %%
 {OBJECT_RECIPIE}                    { yylval.str = strdup(yytext); return OBJECT_RECIPIE; }  /* SPEC_CHAR [!@#\^&*()_+=\-`~\[\]{};'"\\\|,<>\/?] */
-{OBJECT_RECIPIE}{CONTINUE_LINE}                    { skipLines(); yylval.str = strdup(yytext); return OBJECT_RECIPIE;}
+{OBJECT_RECIPIE}{CONTINUE_LINE}     { skipLines(); yylval.str = strdup(yytext); return OBJECT_RECIPIE;}
 
 
 
@@ -71,7 +70,7 @@ OBJECT_RECIPIE \t[^\n]*
                                       yylval.str = text;
                                       return FUNC;
                                     }
-\$\$?\(("error"|"warning")             {}
+\$\$?\(("error"|"warning")          {}
 
 \"[^\"]*\"{CONTINUE_LINE}|\'[^\']*\'{CONTINUE_LINE}           { skipLines(); yylval.str = strdup(yytext); return OBJECT_STR; } /* Обработка разных значений переменных */
 
