@@ -56,6 +56,8 @@ target:
             |
             targetVar ';' ENDL
             |
+            targetVar ';' OBJECT_NAME ':' ENDL
+            |
             targetVar prerequisite ENDL
             |
             targetVar prerequisite ';' ENDL

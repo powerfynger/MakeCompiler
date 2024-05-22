@@ -14,7 +14,7 @@ LETTER [[:alpha:]]
 DIGIT [[:digit:]]
 SPEC_CHAR [.\-*\<>!_@`\\/+?%~]
 CONTINUE_LINE (\\\n[ \t]*[^\n]*)* 
-OBJECT_RECIPIE (@[^@]*@)?\t[^\n]*      
+OBJECT_RECIPIE ^(@[^@]*@)?\t[^\n]*      
 
 %%
 {OBJECT_RECIPIE}                    { yylval.str = strdup(yytext); return OBJECT_RECIPIE; }  /* SPEC_CHAR [!@#\^&*()_+=\-`~\[\]{};'"\\\|,<>\/?] */

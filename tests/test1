@@ -2532,16 +2532,16 @@ s-mddeps: $(md_file) $(MD_INCLUDES) build/genmddeps$(build_exeext)
 # The "; @true" construct forces Make to recheck the timestamp on
 # the target file.
 
-simple_rtl_generated_h	= insn-attr.h insn-attr-common.h insn-codes.h \
-			insn-config.h insn-flags.h insn-target-def.h
+simple_rtl_generated_h = insn-attr.h insn-attr-common.h insn-codes.h \
+ insn-config.h insn-flags.h insn-target-def.h
 
-simple_rtl_generated_c	= insn-automata.cc \
+simple_rtl_generated_c = insn-automata.cc \
 			  insn-extract.cc insn-output.cc \
 			  insn-peep.cc insn-recog.cc
 
-simple_generated_h	= $(simple_rtl_generated_h) insn-constants.h
+simple_generated_h = $(simple_rtl_generated_h) insn-constants.h
 
-simple_generated_c	= $(simple_rtl_generated_c) insn-enums.cc
+simple_generated_c = $(simple_rtl_generated_c) insn-enums.cc
 
 $(simple_generated_h:insn-%.h=s-%) \
 $(simple_generated_c:insn-%.cc=s-%): s-%: $(MD_DEPS)
@@ -3098,15 +3098,15 @@ build/gencfn-macros.o : gencfn-macros.cc $(BCONFIG_H) $(SYSTEM_H)	\
 # All these programs use the RTL reader ($(BUILD_RTL)).
 genprogrtl = attr attr-common attrtab automata codes conditions config emit \
 	     extract flags mddump opinit output peep preds recog target-def
-$(genprogrtl:%=build/gen%$(build_exeext)): $(BUILD_RTL)
+#$(genprogrtl:%=build/gen%$(build_exeext)): $(BUILD_RTL)
 
 # All these programs use the MD reader ($(BUILD_MD)).
 genprogmd = $(genprogrtl) mddeps constants enums
-$(genprogmd:%=build/gen%$(build_exeext)): $(BUILD_MD)
+#$(genprogmd:%=build/gen%$(build_exeext)): $(BUILD_MD)
 
 # All these programs need to report errors.
 genprogerr = $(genprogmd) genrtl modes gtype hooks cfn-macros condmd
-$(genprogerr:%=build/gen%$(build_exeext)): $(BUILD_ERRORS)
+#$(genprogerr:%=build/gen%$(build_exeext)): $(BUILD_ERRORS)
 
 # Remaining build programs.
 genprog = $(genprogerr) check checksum match
@@ -3142,9 +3142,9 @@ gengtype$(exeext) : gengtype.o gengtype-lex.o gengtype-parse.o \
 	    $(filter-out $(LIBDEPS), $^) $(LIBS)
 
 # Rule for the generator programs:
-$(genprog:%=build/gen%$(build_exeext)): build/gen%$(build_exeext): build/gen%.o $(BUILD_LIBDEPS)
-	+$(LINKER_FOR_BUILD) $(BUILD_LINKERFLAGS) $(BUILD_LDFLAGS) -o $@ \
-	    $(filter-out $(BUILD_LIBDEPS), $^) $(BUILD_LIBS)
+#$(genprog:%=build/gen%$(build_exeext)): build/gen%$(build_exeext): build/gen%.o $(BUILD_LIBDEPS)
+#	+$(LINKER_FOR_BUILD) $(BUILD_LINKERFLAGS) $(BUILD_LDFLAGS) -o $@ \
+#	    $(filter-out $(BUILD_LIBDEPS), $^) $(BUILD_LIBS)
 
 omp-general.o: omp-device-properties.h
 
@@ -3489,14 +3489,14 @@ info: $(INFOFILES) lang.info @GENINSRC@ srcinfo lang.srcinfo
 srcinfo: $(INFOFILES)
 	-cp -p $^ $(srcdir)/doc
 
-TEXI_CPP_FILES = cpp.texi fdl.texi cppenv.texi cppopts.texi		\
+TEXI_CPP_FILES = cpp.texi fdl.texi cppenv.texi cppopts.texi \
 	 gcc-common.texi gcc-vers.texi
 
-TEXI_GCC_FILES = gcc.texi gcc-common.texi gcc-vers.texi frontends.texi	\
-	 standards.texi invoke.texi extend.texi md.texi objc.texi	\
-	 gcov.texi trouble.texi bugreport.texi service.texi		\
-	 contribute.texi compat.texi funding.texi gnu.texi gpl_v3.texi	\
-	 fdl.texi contrib.texi cppenv.texi cppopts.texi avr-mmcu.texi	\
+TEXI_GCC_FILES = gcc.texi gcc-common.texi gcc-vers.texi frontends.texi \
+	 standards.texi invoke.texi extend.texi md.texi objc.texi \
+	 gcov.texi trouble.texi bugreport.texi service.texi \
+	 contribute.texi compat.texi funding.texi gnu.texi gpl_v3.texi \
+	 fdl.texi contrib.texi cppenv.texi cppopts.texi avr-mmcu.texi \
 	 implement-c.texi implement-cxx.texi gcov-tool.texi gcov-dump.texi \
 	 lto-dump.texi
 
