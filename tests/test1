@@ -1969,7 +1969,7 @@ s-alltree: Makefile
 # causes back-end specific include files to be poisoned, in the hope that
 # we can avoid introducing dependencies of the front ends on things that
 # no front end should ever look at (e.g. everything RTL related).
-$(foreach file,$(ALL_HOST_FRONTEND_OBJS),$(eval CFLAGS-$(file) += -DIN_GCC_FRONTEND))
+# $(foreach file,$(ALL_HOST_FRONTEND_OBJS),$(eval CFLAGS-$(file) += -DIN_GCC_FRONTEND)) СЛОЖНО
 
 #
 
@@ -2533,7 +2533,7 @@ s-mddeps: $(md_file) $(MD_INCLUDES) build/genmddeps$(build_exeext)
 # the target file.
 
 simple_rtl_generated_h	= insn-attr.h insn-attr-common.h insn-codes.h \
-			  insn-config.h insn-flags.h insn-target-def.h
+			insn-config.h insn-flags.h insn-target-def.h
 
 simple_rtl_generated_c	= insn-automata.cc \
 			  insn-extract.cc insn-output.cc \

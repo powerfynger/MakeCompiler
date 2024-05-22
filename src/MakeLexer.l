@@ -12,9 +12,9 @@ static void parseFunction(char **text);
 
 LETTER [[:alpha:]]
 DIGIT [[:digit:]]
-SPEC_CHAR [.\-*\<>!_@`\\/+?%]
+SPEC_CHAR [.\-*\<>!_@`\\/+?%~]
 CONTINUE_LINE (\\\n[ \t]*[^\n]*)* 
-OBJECT_RECIPIE \t[^\n]*      
+OBJECT_RECIPIE (@[^@]*@)?\t[^\n]*      
 
 %%
 {OBJECT_RECIPIE}                    { yylval.str = strdup(yytext); return OBJECT_RECIPIE; }  /* SPEC_CHAR [!@#\^&*()_+=\-`~\[\]{};'"\\\|,<>\/?] */
@@ -84,7 +84,7 @@ OBJECT_RECIPIE \t[^\n]*
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+(\/({LETTER}|{DIGIT}|{SPEC_CHAR})+)+                 { yylval.str = strdup(yytext); return PATH; } /* Обработка относительного пути для Windows */
 
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+"."({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}  { printf("%s\n", yytext);skipLines(); yylval.str = strdup(yytext); return FILE_NAME; }
-
+\@({LETTER}|{DIGIT}|{SPEC_CHAR})+\@{CONTINUE_LINE}   { } /* Обработка имён целей, файлов, путей к файлам */
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}   { skipLines(); yylval.str = strdup(yytext); return OBJECT_NAME; } /* Обработка имён целей, файлов, путей к файлам */
 
 ^"."(({LETTER}|{SPEC_CHAR})+)    { yylval.str = strdup(yytext); return OBJECT_SPECIAL; } /* Обработка специальных целей; TODO: В .y добавить проверку на существование заданной спец. цели */
