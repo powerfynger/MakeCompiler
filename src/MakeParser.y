@@ -157,7 +157,7 @@ recipiePart:
 
 // --------------------- VARIABLES -----------------------
 variable: 
-            variableName ASSIGNMENT variableBody ENDL
+            variableName ASSIGNMENT variableBody ENDL 
             |
             variableName ASSIGNMENT ENDL
             |
@@ -240,6 +240,8 @@ variableValue:
             |
             '$' '(' OBJECT_NAME ')'
             |
+            '$' '(' FILE_NAME ')'
+            |
             '$' '{' OBJECT_NAME '}'
             |
             '$' '$' '(' OBJECT_NAME ')'
@@ -250,11 +252,11 @@ variableValue:
             |
             '$' '{' variablePart '}'
             |
-            '$' '(' OBJECT_NAME ':' substitution ASSIGNMENT substitution ')' // Ссылки на замену (Substitution References)
+            '$' '(' OBJECT_NAME ':' substitution ASSIGNMENT substitution ')'  // Ссылки на замену (Substitution References) 
             |
             '$' '{' OBJECT_NAME ':' substitution ASSIGNMENT substitution '}'
             |
-            '$' '(' variablePart ':' substitution ASSIGNMENT substitution ')'
+            '$' '(' variablePart ':' substitution ASSIGNMENT substitution ')' 
             |
             '$' '{' variablePart ':' substitution ASSIGNMENT substitution '}'
             ;
@@ -263,18 +265,25 @@ substitution:
             OBJECT_NAME
             |
             FILE_NAME
+            |
+            PATH
             ;
 // -------------------------------------------------------
 
 // ---------------------- DEFINES ------------------------
 define:
-            DEFINE OBJECT_NAME ENDL
+            DEFINE defineName ENDL
             defineBody ENDL
             ENDEF ENDL
             |
-            DEFINE OBJECT_NAME ASSIGNMENT ENDL
+            DEFINE defineName ASSIGNMENT ENDL
             defineBody ENDL
             ENDEF ENDL
+            ;
+
+defineName:
+            OBJECT_NAME { addVariable((char*)$1); }
+            | FILE_NAME { addVariable((char*)$1); }
             ;
 
 defineBody:
@@ -287,6 +296,8 @@ definePart:
             variableValue
             |
             defineSigns
+            |
+            OBJECT_RECIPIE
             |
             ASSIGNMENT
             |
@@ -312,11 +323,11 @@ defineSigns:
 
 // -------------------- CONDITIONS -----------------------
 condition:
-            if '(' arg ',' arg ')' ENDL
+            if '(' args ',' args ')' ENDL
             |
-            if '(' arg ',' ')' ENDL
+            if '(' args ',' ')' ENDL
             |
-            if '(' ',' arg ')' ENDL
+            if '(' ',' args ')' ENDL
             |
             if '(' ',' ')' ENDL
             |
@@ -339,6 +350,14 @@ ifdef:
             IFDEF
             |
             IFNDEF
+            ;
+
+args:       
+            args ASSIGNMENT arg
+            |
+            args arg
+            |
+            arg
             ;
 
 arg:

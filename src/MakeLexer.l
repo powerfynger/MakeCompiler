@@ -12,7 +12,7 @@ static void parseFunction(char **text);
 
 LETTER [[:alpha:]]
 DIGIT [[:digit:]]
-SPEC_CHAR [.\-*\<>!_@`\\/+?]
+SPEC_CHAR [.\-*\<>!_@`\\/+?%]
 CONTINUE_LINE (\\\n[ \t]*[^\n]*)* 
 OBJECT_RECIPIE \t[^\n]*      
 
@@ -24,7 +24,8 @@ OBJECT_RECIPIE \t[^\n]*
 
 \#.*       {} /* Обработка комментариев */
 
-\$\$?\(?[@%\<?^+*][DF]?\)?          { yylval.str = strdup(yytext); /*return AUTOMATIC;*/ }
+\$\$?\([@%\<?^+*][DF]?\)            { yylval.str = strdup(yytext); /*return AUTOMATIC;*/ }
+\$\$?[@%\<?^+*][DF]?                { yylval.str = strdup(yytext); /*return AUTOMATIC;*/ }
 [(){}[\]$\-+"\|/&\<>`!?,:;]         { return *yytext; }
 
 \n                                  { ++currLine; return ENDL; }
@@ -44,7 +45,7 @@ OBJECT_RECIPIE \t[^\n]*
 ^"override"                         { return EXPORT; }
 
 ^"define"                           { return DEFINE; }
-^"include"                          { return INCLUDE; }
+^[\-]?"include"                          { return INCLUDE; }
 
 \$\$?\(("foreach"|"wildcard"|"patsubst"|"addprefix"|"subst"|"patsubst"|"strip"|"findstring") {   
                                       char* text = NULL;
@@ -82,13 +83,13 @@ OBJECT_RECIPIE \t[^\n]*
 
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+(\/({LETTER}|{DIGIT}|{SPEC_CHAR})+)+                 { yylval.str = strdup(yytext); return PATH; } /* Обработка относительного пути для Windows */
 
-({LETTER}|{DIGIT}|{SPEC_CHAR})+"."({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}  { skipLines(); yylval.str = strdup(yytext); return FILE_NAME; }
+({LETTER}|{DIGIT}|{SPEC_CHAR})+"."({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}  { printf("%s\n", yytext);skipLines(); yylval.str = strdup(yytext); return FILE_NAME; }
 
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}   { skipLines(); yylval.str = strdup(yytext); return OBJECT_NAME; } /* Обработка имён целей, файлов, путей к файлам */
 
 ^"."(({LETTER}|{SPEC_CHAR})+)    { yylval.str = strdup(yytext); return OBJECT_SPECIAL; } /* Обработка специальных целей; TODO: В .y добавить проверку на существование заданной спец. цели */
 
-\%({LETTER}|{DIGIT}|{SPEC_CHAR})*    { yylval.str = strdup(yytext); return OBJECT_NAME; }
+\%({LETTER}|{DIGIT}|{SPEC_CHAR})*    { printf("Obj name: %s; Curr line: %d\n", yytext-1, currLine); yylval.str = strdup(yytext); return OBJECT_NAME; }
 
 
 {LETTER}{DIGIT}?:\\({LETTER}|{DIGIT}|{SPEC_CHAR})+\\({LETTER}|{DIGIT}|{SPEC_CHAR})+ { yylval.str = strdup(yytext); return PATH; } /* Обработка абсолютного пути для Windows */
