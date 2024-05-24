@@ -33,11 +33,11 @@ in:
 line: 
             ENDL
             |
-            target { setState(1); }
+            target { setState(1); } 
             |
-            recipies { checkState(); }
+            recipies { checkState(); } 
             |
-            variable { setState(0); }
+            variable { setState(0); } 
             |
             include
             |
@@ -58,7 +58,7 @@ target:
             |
             targetVar ';' OBJECT_NAME ':' ENDL
             |
-            targetVar prerequisite ENDL
+            targetVar prerequisite ENDL 
             |
             targetVar prerequisite ';' ENDL
             |
@@ -74,7 +74,7 @@ target:
             ;
 
 targetVar: 
-            targetExpr ':'
+            targetExpr ':' 
             |
             targetExpr ':' ':'
             |
@@ -159,9 +159,9 @@ recipiePart:
 
 // --------------------- VARIABLES -----------------------
 variable: 
-            variableName ASSIGNMENT variableBody ENDL 
+            variableName ASSIGNMENT variableBody ENDL  
             |
-            variableName ASSIGNMENT ENDL
+            variableName ASSIGNMENT ENDL 
             |
             EXPORT variable
             |
@@ -171,7 +171,7 @@ variable:
             ;
 
 variableName:
-            OBJECT_NAME { addVariable((char*)$1); }
+            OBJECT_NAME { addVariable((char*)$1); } 
             |
             FILE_NAME
             |
@@ -197,7 +197,7 @@ variableBody:
             |
             variablePart
             |
-            variableBody variablePart
+            variableBody variablePart 
             |
             variableBody OBJECT_NAME 
             |
@@ -207,7 +207,7 @@ variableBody:
             |
             variableBody PATH
             |
-            '(' variableBody ')'
+            '(' variableBody ')'  
             |
             '{' variableBody '}'
             |
@@ -240,7 +240,7 @@ variableValue:
             |
             '$' '$' OBJECT_NAME // $$ Для передачи переменных в скрипты bash e.t.c.
             |
-            '$' '(' OBJECT_NAME ')'
+            '$' '(' OBJECT_NAME ')' 
             |
             '$' '(' FILE_NAME ')'
             |
@@ -250,7 +250,7 @@ variableValue:
             |
             '$' '$' '{' OBJECT_NAME '}'
             |
-            '$' '(' variablePart ')'
+            '$' '(' variablePart ')' 
             |
             '$' '{' variablePart '}'
             |
@@ -258,7 +258,7 @@ variableValue:
             |
             '$' '{' OBJECT_NAME ':' substitution ASSIGNMENT substitution '}'
             |
-            '$' '(' variablePart ':' substitution ASSIGNMENT substitution ')' 
+            '$' '(' variablePart ':' substitution ASSIGNMENT substitution ')'  
             |
             '$' '{' variablePart ':' substitution ASSIGNMENT substitution '}'
             ;
@@ -355,7 +355,7 @@ ifdef:
             ;
 
 args:       
-            args ASSIGNMENT arg
+            args ASSIGNMENT arg  
             |
             args arg
             |
@@ -402,7 +402,7 @@ atomics:
             ;
 
 atomic:
-            variableValue
+            variableValue 
             |
             OBJECT_NAME
             |

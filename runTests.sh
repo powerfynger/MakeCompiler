@@ -11,7 +11,7 @@ for file in "$test_dir"/*; do
     total_lines=$(wc -l < "$file")
 
     if echo "$output" | grep -q "\[+\] Analysis is completed successfully."; then
-        echo -e "${GREEN}[✔] $file $total_lines/$total_lines (100%)"
+        echo -e "${GREEN}[✔] $file $total_lines/$total_lines (100.00%)"
     else
         line_number=$(echo "$output" | grep -oP '(?<=\[Line )\d+(?=\])')
         percentage=$(echo "scale=2; ($line_number / $total_lines) * 100" | bc)

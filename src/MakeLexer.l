@@ -5,6 +5,8 @@ int yyerror(const char *s);
 unsigned int currLine = 1;
 static void skipLines();
 static void parseFunction(char **text);
+void LexerDebugPrint(char* lexema);
+
 %}
 
 %option yylineno
@@ -26,7 +28,6 @@ OBJECT_RECIPIE ^(@[^@]*@)?\t[^\n]*
 
 \$\$?\([@%\<?^+*][DF]?\)            { yylval.str = strdup(yytext); /*return AUTOMATIC;*/ }
 \$\$?[@%\<?^+*][DF]?                { yylval.str = strdup(yytext); /*return AUTOMATIC;*/ }
-[(){}[\]$\-+"\|/&\<>`!?,:;]         { return *yytext; }
 
 \n                                  { ++currLine; return ENDL; }
 [ \t]+\n                            { ++currLine; return ENDL; }
@@ -42,7 +43,7 @@ OBJECT_RECIPIE ^(@[^@]*@)?\t[^\n]*
 
 ^"unexport"                         { return EXPORT; }
 ^"export"                           { return EXPORT; }
-^"override"                         { return EXPORT; }
+"override"                         { return EXPORT; }
 
 ^"define"                           { return DEFINE; }
 ^[\-]?"include"                          { return INCLUDE; }
@@ -73,9 +74,11 @@ OBJECT_RECIPIE ^(@[^@]*@)?\t[^\n]*
                                     }
 \$\$?\(("error"|"warning")          {}
 
-\"[^\"]*\"{CONTINUE_LINE}|\'[^\']*\'{CONTINUE_LINE}           { skipLines(); yylval.str = strdup(yytext); return OBJECT_STR; } /* Обработка разных значений переменных */
 
-"::="|":::="|[":!?+"]?"="           { return ASSIGNMENT; }
+
+\"[^\"]*\"{CONTINUE_LINE}|\'[^\']*\'{CONTINUE_LINE}|\`[^\`]*\`{CONTINUE_LINE}           { skipLines(); yylval.str = strdup(yytext); return OBJECT_STR; } /* Обработка разных значений переменных */
+
+"::="|":::="|[":!?+"]?"="           { LexerDebugPrint("Assignment"); return ASSIGNMENT; }
 
 \/({LETTER}|{DIGIT}|{SPEC_CHAR})+(\/({LETTER}|{DIGIT}|{SPEC_CHAR})+)+               { yylval.str = strdup(yytext); return PATH; } /* Обработка абсолютного пути для Unix */
 
@@ -84,13 +87,16 @@ OBJECT_RECIPIE ^(@[^@]*@)?\t[^\n]*
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+(\/({LETTER}|{DIGIT}|{SPEC_CHAR})+)+                 { yylval.str = strdup(yytext); return PATH; } /* Обработка относительного пути для Windows */
 
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+"."({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}  { skipLines(); yylval.str = strdup(yytext); return FILE_NAME; }
+
 \@({LETTER}|{DIGIT}|{SPEC_CHAR})+\@{CONTINUE_LINE}   { } /* Обработка имён целей, файлов, путей к файлам */
-({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}   { skipLines(); yylval.str = strdup(yytext); return OBJECT_NAME; } /* Обработка имён целей, файлов, путей к файлам */
+
+({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}   { LexerDebugPrint("Object name"); skipLines(); yylval.str = strdup(yytext); return OBJECT_NAME; } /* Обработка имён целей, файлов, путей к файлам */
 
 ^"."(({LETTER}|{SPEC_CHAR})+)    { yylval.str = strdup(yytext); return OBJECT_SPECIAL; } /* Обработка специальных целей; TODO: В .y добавить проверку на существование заданной спец. цели */
 
-\%({LETTER}|{DIGIT}|{SPEC_CHAR})*    { printf("Obj name: %s; Curr line: %d\n", yytext-1, currLine); yylval.str = strdup(yytext); return OBJECT_NAME; }
+\%({LETTER}|{DIGIT}|{SPEC_CHAR})*    {  yylval.str = strdup(yytext); return OBJECT_NAME; }
 
+[(){}[\]$\-+"\|/&\<>`!?,:;]         {return *yytext; } /* ПУСТЬ ПОКА ТУТ ПОСТОИТ; РАНЬШЕ БЫЛА НАВЕРХУ ПОСЛЕ АВТОМАТИКОВ ПЕРЕД ЕНДЛАМИ */
 
 {LETTER}{DIGIT}?:\\({LETTER}|{DIGIT}|{SPEC_CHAR})+\\({LETTER}|{DIGIT}|{SPEC_CHAR})+ { yylval.str = strdup(yytext); return PATH; } /* Обработка абсолютного пути для Windows */
 
@@ -170,4 +176,9 @@ static void skipLines()
     }
     // printf("Line: %d\nChar: %s", line, p);
     currLine = line;
+}
+
+void LexerDebugPrint(char* lexema)
+{
+    // printf("%s: %s Line: %d\n", lexema, yytext, yylineno);
 }
