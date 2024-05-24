@@ -58,6 +58,8 @@ target:
             |
             targetVar ';' OBJECT_NAME ':' ENDL
             |
+            targetVar ';' OBJECT_NAME ENDL
+            |
             targetVar prerequisite ENDL 
             |
             targetVar prerequisite ';' ENDL
@@ -96,7 +98,7 @@ targetExpr:
 targetName: 
             variableValue
             |
-            OBJECT_NAME { addTarget((char*)$1); }
+            OBJECT_NAME { addTarget((char*)$1); } 
             |
             FILE_NAME { addTarget((char*)$1); }
             |
@@ -114,7 +116,9 @@ targetName:
 
 // ------------------- PREREQUISITE ----------------------
 prerequisite:
-            prerequisites
+            prerequisites 
+            |
+            prerequisites ':'
             ;
 
             // Для учета множественных prerequisites
@@ -127,13 +131,13 @@ prerequisites:
             |
             prerequisites ':' prerequisiteName // Syntax of Static Pattern Rules
             |
-            prerequisiteName
+            prerequisiteName 
             ;
 
 prerequisiteName:
             variableValue
             |
-            OBJECT_NAME
+            OBJECT_NAME 
             |
             FILE_NAME
             |
@@ -183,11 +187,7 @@ variableName:
             ;
 
 variableBody:
-            OBJECT_NAME {
-                // char temp[512];
-                // sprintf(temp, "variableBody: %s", (char*)$1);
-                // debugPrint(temp);
-            }
+            OBJECT_NAME  
             |
             OBJECT_STR 
             |
@@ -234,35 +234,40 @@ variablePart:
 variableSigns:
             '-' | '+' | ':' | '&' | '>' | '<' | '[' | ']' | ';' | '/' | '|'
             ;
-
-variableValue:
-            '$' OBJECT_NAME
+variableValue: // Было бы неплохо переписать с использованием вложенных получений значений переменных см. 4366 test1
+            '$' variableValueSource
             |
-            '$' '$' OBJECT_NAME // $$ Для передачи переменных в скрипты bash e.t.c.
+            '$' '$' variableValueSource // $$ Для передачи переменных в скрипты bash e.t.c.
             |
-            '$' '(' OBJECT_NAME ')' 
+            '$' '(' variableValueSource ')'
             |
-            '$' '(' FILE_NAME ')'
+            '$' '{' variableValueSource '}'
             |
-            '$' '{' OBJECT_NAME '}'
+            '$' '$' '(' variableValueSource ')'
             |
-            '$' '$' '(' OBJECT_NAME ')'
-            |
-            '$' '$' '{' OBJECT_NAME '}'
+            '$' '$' '{' variableValueSource '}'
             |
             '$' '(' variablePart ')' 
             |
-            '$' '{' variablePart '}'
+            '$' '{' variablePart '}' 
             |
-            '$' '(' OBJECT_NAME ':' substitution ASSIGNMENT substitution ')'  // Ссылки на замену (Substitution References) 
+            '$' '(' variableValueSource ASSIGNMENT substitution ')'  // см. 4327 test1
             |
-            '$' '{' OBJECT_NAME ':' substitution ASSIGNMENT substitution '}'
+            '$' '(' variableValueSource ':' substitution ASSIGNMENT substitution ')'  // Ссылки на замену (Substitution References) 
+            |
+            '$' '{' variableValueSource ':' substitution ASSIGNMENT substitution '}'
             |
             '$' '(' variablePart ':' substitution ASSIGNMENT substitution ')'  
             |
             '$' '{' variablePart ':' substitution ASSIGNMENT substitution '}'
             ;
 
+variableValueSource:
+            OBJECT_NAME
+            |
+            FILE_NAME
+            ;
+            
 substitution:
             OBJECT_NAME
             |

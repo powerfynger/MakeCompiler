@@ -4363,7 +4363,7 @@ $(patsubst %,%-subtargets,$(lang_checks)): check-%-subtargets:
 	@echo check-$*
 
 check_p_tool=$(firstword $(subst _, ,$*))
-check_p_count=$(check_$(check_p_tool)_parallelize)
+# check_p_count=$(check_$(check_p_tool)_parallelize) 
 check_p_subno=$(word 2,$(subst _, ,$*))
 check_p_subdir=$(subst _,,$*)
 check_p_subdirs=$(wordlist 1,$(check_p_count),$(wordlist 1, \

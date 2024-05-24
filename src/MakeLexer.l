@@ -78,7 +78,7 @@ OBJECT_RECIPIE ^(@[^@]*@)?\t[^\n]*
 
 \"[^\"]*\"{CONTINUE_LINE}|\'[^\']*\'{CONTINUE_LINE}|\`[^\`]*\`{CONTINUE_LINE}           { skipLines(); yylval.str = strdup(yytext); return OBJECT_STR; } /* Обработка разных значений переменных */
 
-"::="|":::="|[":!?+"]?"="           { LexerDebugPrint("Assignment"); return ASSIGNMENT; }
+"::="|":::="|[":!?+"]?"="           { return ASSIGNMENT; }
 
 \/({LETTER}|{DIGIT}|{SPEC_CHAR})+(\/({LETTER}|{DIGIT}|{SPEC_CHAR})+)+               { yylval.str = strdup(yytext); return PATH; } /* Обработка абсолютного пути для Unix */
 
@@ -88,15 +88,15 @@ OBJECT_RECIPIE ^(@[^@]*@)?\t[^\n]*
 
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+"."({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}  { skipLines(); yylval.str = strdup(yytext); return FILE_NAME; }
 
-\@({LETTER}|{DIGIT}|{SPEC_CHAR})+\@{CONTINUE_LINE}   { } /* Обработка имён целей, файлов, путей к файлам */
+\@({LETTER}|{DIGIT}|{SPEC_CHAR})+\@{CONTINUE_LINE}   {  } /* Обработка имён целей, файлов, путей к файлам */
 
-({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}   { LexerDebugPrint("Object name"); skipLines(); yylval.str = strdup(yytext); return OBJECT_NAME; } /* Обработка имён целей, файлов, путей к файлам */
+({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}   { skipLines(); yylval.str = strdup(yytext); return OBJECT_NAME; } /* Обработка имён целей, файлов, путей к файлам */
 
 ^"."(({LETTER}|{SPEC_CHAR})+)    { yylval.str = strdup(yytext); return OBJECT_SPECIAL; } /* Обработка специальных целей; TODO: В .y добавить проверку на существование заданной спец. цели */
 
 \%({LETTER}|{DIGIT}|{SPEC_CHAR})*    {  yylval.str = strdup(yytext); return OBJECT_NAME; }
 
-[(){}[\]$\-+"\|/&\<>`!?,:;]         {return *yytext; } /* ПУСТЬ ПОКА ТУТ ПОСТОИТ; РАНЬШЕ БЫЛА НАВЕРХУ ПОСЛЕ АВТОМАТИКОВ ПЕРЕД ЕНДЛАМИ */
+[(){}[\]$\-+"\|/&\<>`!?,:;]         { return *yytext; } /* ПУСТЬ ПОКА ТУТ ПОСТОИТ; РАНЬШЕ БЫЛА НАВЕРХУ ПОСЛЕ АВТОМАТИКОВ ПЕРЕД ЕНДЛАМИ */
 
 {LETTER}{DIGIT}?:\\({LETTER}|{DIGIT}|{SPEC_CHAR})+\\({LETTER}|{DIGIT}|{SPEC_CHAR})+ { yylval.str = strdup(yytext); return PATH; } /* Обработка абсолютного пути для Windows */
 
@@ -180,5 +180,5 @@ static void skipLines()
 
 void LexerDebugPrint(char* lexema)
 {
-    // printf("%s: %s Line: %d\n", lexema, yytext, yylineno);
+    printf("%s: %s Line: %d\n", lexema, yytext, yylineno);
 }
