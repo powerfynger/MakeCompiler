@@ -1969,7 +1969,8 @@ s-alltree: Makefile
 # causes back-end specific include files to be poisoned, in the hope that
 # we can avoid introducing dependencies of the front ends on things that
 # no front end should ever look at (e.g. everything RTL related).
-# $(foreach file,$(ALL_HOST_FRONTEND_OBJS),$(eval CFLAGS-$(file) += -DIN_GCC_FRONTEND)) СЛОЖНО
+$(wildcard file)
+$(foreach file,$(ALL_HOST_FRONTEND_OBJS),$(eval CFLAGS-$(file) += -DIN_GCC_FRONTEND))
 
 #
 

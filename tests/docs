@@ -472,7 +472,8 @@ all :
 	space
 
 
-all : ;	@echo 'hello \ # Команда сразу после зависимостей
+all : ;	
+	@echo 'hello \ # Команда сразу после зависимостей
 	world' ; echo "hello \
 	world"
 
@@ -480,7 +481,8 @@ all : ;	@echo 'hello \ # Команда сразу после зависимос
 HELLO = 'hello \
 world'
 
-all : ;	@echo $(HELLO)
+all : ;
+	@echo $(HELLO)
 
 # 5.1.2 Using Variables in Recipes
 
@@ -534,7 +536,9 @@ foo : bar/lose
 # 5.4.1 Disabling Parallel Execution
 
 all: one two three
-one two three: ;	@sleep 1;	echo $@
+one two three: ;
+	@sleep 1;
+	echo $@
 
 .NOTPARALLEL:
 

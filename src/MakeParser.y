@@ -33,6 +33,8 @@ in:
 line: 
             ENDL
             |
+            FUNC ENDL
+            |
             target { setState(1); } 
             |
             recipies { checkState(); } 
@@ -234,6 +236,7 @@ variablePart:
 variableSigns:
             '-' | '+' | ':' | '&' | '>' | '<' | '[' | ']' | ';' | '/' | '|'
             ;
+
 variableValue: // Было бы неплохо переписать с использованием вложенных получений значений переменных см. 4366 test1
             '$' variableValueSource
             |

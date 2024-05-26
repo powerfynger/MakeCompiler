@@ -66,14 +66,12 @@ OBJECT_RECIPIE ^(@[^@]*@)?\t[^\n]*
                                       yylval.str = text;
                                       return FUNC;
                                     }
-\$\$?\(("let"|"if"|"or"|"and"|"intcmp"|"call"|"eval"|"file"|"value"|"shell") {   
+\$\$?\(("let"|"if"|"or"|"and"|"intcmp"|"call"|"eval"|"file"|"value"|"shell"|"error"|"warning") {   
                                       char* text = NULL;
                                       parseFunction(&text);
                                       yylval.str = text;
                                       return FUNC;
                                     }
-\$\$?\(("error"|"warning")          {}
-
 
 
 \"[^\"]*\"{CONTINUE_LINE}|\'[^\']*\'{CONTINUE_LINE}|\`[^\`]*\`{CONTINUE_LINE}           { skipLines(); yylval.str = strdup(yytext); return OBJECT_STR; } /* Обработка разных значений переменных */
