@@ -2175,7 +2175,8 @@ native: config.status auto-host.h build-@POSUB@ $(LANGUAGES) \
 	gcc-ar$(exeext) gcc-nm$(exeext) gcc-ranlib$(exeext)
 
 ifeq ($(enable_plugin),yes)
-native: gengtype$(exeext)
+native:
+	gengtype$(exeext)
 endif
 
 # On the target machine, finish building a cross compiler.

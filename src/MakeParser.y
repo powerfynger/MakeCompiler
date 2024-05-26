@@ -185,9 +185,9 @@ exportSource:
 variableName:
             OBJECT_NAME { addVariable((char*)$1); } 
             |
-            FILE_NAME
+            FILE_NAME { addVariable((char*)$1); } 
             |
-            PATH
+            PATH { addVariable((char*)$1); } 
             |
             AUTOMATIC {
                 yyerror("automatic variable in variable name");
