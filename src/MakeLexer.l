@@ -141,6 +141,13 @@ static void parseFunction(char **text)
                     (*text)[len++] = '\\'; 
                     (*text)[len++] = '\n'; 
                 }
+                else if (prev == ',')
+                {
+                    ++currLine;
+                    *text = realloc(*text, len + 3);
+                    (*text)[len++] = ','; 
+                    (*text)[len++] = '\n'; 
+                }
                 else
                     yyerror("syntax function error");                
                 break;
