@@ -90,9 +90,6 @@ OBJECT_RECIPIE ^(@[^@]*@)?\t[^\n]*
 
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}   { skipLines(); yylval.str = strdup(yytext); return OBJECT_NAME; } /* Обработка имён целей, файлов, путей к файлам */
 
-^"."(({LETTER}|{SPEC_CHAR})+)    { yylval.str = strdup(yytext); return OBJECT_SPECIAL; } /* Обработка специальных целей; TODO: В .y добавить проверку на существование заданной спец. цели */
-
-\%({LETTER}|{DIGIT}|{SPEC_CHAR})*    {  yylval.str = strdup(yytext); return OBJECT_NAME; }
 
 [(){}[\]$\-+"\|/&\<>`!?,:;]         { return *yytext; } /* ПУСТЬ ПОКА ТУТ ПОСТОИТ; РАНЬШЕ БЫЛА НАВЕРХУ ПОСЛЕ АВТОМАТИКОВ ПЕРЕД ЕНДЛАМИ */
 
