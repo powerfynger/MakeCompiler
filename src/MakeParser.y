@@ -171,9 +171,15 @@ variable:
             |
             EXPORT variable
             |
-            EXPORT OBJECT_NAME ENDL
+            EXPORT exportSource ENDL
             |
             EXPORT ENDL
+            ;
+
+exportSource:
+            exportSource OBJECT_NAME
+            |
+            OBJECT_NAME
             ;
 
 variableName:
