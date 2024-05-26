@@ -17,6 +17,8 @@ BUILD_FILES = ./build/lex.yy.c ./build/MakeParser.tab.c ./src/MakeHelper.c
 
 log:
 	$(YACC) -d $(PARSER_FILE) -Wcounterexamples 2> logs.txt
+	$(MOVE) MakeParser.tab.h ./build
+	$(MOVE) MakeParser.tab.c ./build
 
 clean:
 	rm -f $(RESULT_FILES)
