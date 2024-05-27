@@ -4,6 +4,7 @@ test_dir="./tests"
 
 GREEN='\033[0;32m'
 RED='\033[0;31m'
+YELLOW='\033[0;33m'
 
 total_errors=0
 
@@ -22,13 +23,16 @@ for file in "$test_dir"/*; do
         if [ -z "$line_number" ]; then
             line_number=0
         fi
-        passed_lines=$((line_number - error_count))
+        passed_lines=$(($total_lines - error_count))
         if [ "$passed_lines" -lt 0 ]; then
             passed_lines=0
         fi
         percentage=$(echo "scale=2; ($passed_lines / $total_lines) * 100" | bc)
-        
-        echo -e "${RED}[✖] $file $passed_lines/$total_lines ($percentage%). Number of errors $error_count "
+        if (( $(echo "$percentage > 50" | bc -l) )); then
+            echo -e "${YELLOW}[⚤] $file $passed_lines/$total_lines ($percentage%). Number of errors $error_count "
+        else 
+            echo -e "${RED}[✖] $file $passed_lines/$total_lines ($percentage%). Number of errors $error_count "
+        fi
     fi
 done
 
