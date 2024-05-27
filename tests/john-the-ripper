@@ -33,7 +33,7 @@ OMPFLAGS =
 #ICCOMPFLAGS = -openmp
 
 # NSS (and NSPR) flag, un-comment if installed (needed for mozilla format)
-#HAVE_NSS = -DHAVE_NSS `pkg-config --cflags nss`
+HAVE_NSS = -DHAVE_NSS `pkg-config --cflags nss`
 
 # Change sm_10 to sm_20 if you have Fermi support (400 series or later)
 NVCC_FLAGS = -c -Xptxas -v -arch sm_10
@@ -183,6 +183,9 @@ BENCH_OBJS = \
 	bench-t.o best.o common.o config_g.o formats_g.o math.o memory.o \
 	miscnl.o params.o path.o signals.o tty.o
 
+BENCH_PARA_DEPEND = \
+	sse-intrinsics.o rawMD4_fmt_plug.o rawMD5_fmt_plug.o rawSHA1_fmt_plug.o MD5_fmt.o MD5_std.o
+
 PARA_BENCH_32_OBJS = \
 	bench-t.o para-best.o common.o config_g.o formats_g.o math.o memory.o \
 	miscnl.o params.o path.o signals.o tty.o sha1-mmx.o md4-mmx.o \
@@ -191,9 +194,6 @@ PARA_BENCH_32_OBJS = \
 PARA_BENCH_OBJS = \
 	bench-t.o para-best.o common.o config_g.o formats_g.o math.o memory.o \
 	miscnl.o params.o path.o signals.o tty.o $(BENCH_PARA_DEPEND)
-
-BENCH_PARA_DEPEND = \
-	sse-intrinsics.o rawMD4_fmt_plug.o rawMD5_fmt_plug.o rawSHA1_fmt_plug.o MD5_fmt.o MD5_std.o
 
 GENMKVPWD_OBJS = \
 	genmkvpwd.o mkvlib.o memory.o miscnl.o

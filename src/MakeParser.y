@@ -5,6 +5,7 @@ int yyparse();
 extern int yylex();
 extern FILE* yyin;
 extern int yylineno;
+extern int yyerrors; 
 
 void debugPrint(char* value);
 %}
@@ -464,6 +465,7 @@ int main(int argc, char* argv[])
         return DEFAULT_ERROR;
     }
     yyin = inputFile;
+    yyerrors = 0;
     yyparse();
     fclose(yyin);
     printStats();
@@ -473,8 +475,9 @@ int main(int argc, char* argv[])
 int yyerror(const char *s)
 {  
     fprintf(stderr, "[Line %u] Error: %s\n", yylineno, s);
-    fprintf(stderr, "[!] Finished.\n");
-    exit(0);
+    yyerrors++;
+    //fprintf(stderr, "[!] Finished.\n");
+    //exit(0);
 }
 
 void debugPrint(char* value)

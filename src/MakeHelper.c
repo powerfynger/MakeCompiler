@@ -1,6 +1,7 @@
 #include "MakeHelper.h"
 
 extern int yylineno;
+int yyerrors = 0; 
 
 char** targetList = NULL;
 int targetSize = 0;
@@ -90,9 +91,11 @@ void checkState()
 
 void printStats()
 {
-    printf("Statistics of the analyzed makefile:\n\n"
+    printf("\nStatistics of the analyzed makefile:\n\n"
            "Lines: %d\n"
            "Targets: %d\n"
-           "Variables: %d\n\n", 
-           yylineno, targetSize, variableSize);
+           "Variables: %d\n"
+           "------------------------------------\n"
+           "[!] Conflicts: %d\n\n", 
+           yylineno, targetSize, variableSize, yyerrors);
 }
