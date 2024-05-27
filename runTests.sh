@@ -29,7 +29,7 @@ for file in "$test_dir"/*; do
         fi
         percentage=$(echo "scale=2; ($passed_lines / $total_lines) * 100" | bc)
         if (( $(echo "$percentage > 50" | bc -l) )); then
-            echo -e "${YELLOW}[⚤] $file $passed_lines/$total_lines ($percentage%). Number of errors $error_count "
+            echo -e "${YELLOW}[⚠] $file $passed_lines/$total_lines ($percentage%). Number of errors $error_count "
         else 
             echo -e "${RED}[✖] $file $passed_lines/$total_lines ($percentage%). Number of errors $error_count "
         fi
