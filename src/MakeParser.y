@@ -40,7 +40,7 @@ line:
             |
             recipies { checkStateRecipe(); } 
             |
-            variable { setState(STATE_NORMAL); } 
+            variable 
             |
             include
             |
@@ -186,11 +186,11 @@ exportSource:
             ;
 
 variableName:
-            OBJECT_NAME { addVariable((char*)$1); } 
+            OBJECT_NAME { setState(STATE_DEFINE); addVariable((char*)$1); } 
             |
-            FILE_NAME { addVariable((char*)$1); } 
+            FILE_NAME { setState(STATE_DEFINE); addVariable((char*)$1); } 
             |
-            PATH { addVariable((char*)$1); } 
+            PATH { setState(STATE_DEFINE); addVariable((char*)$1); } 
             |
             AUTOMATIC {
                 yyerror("automatic variable in variable name");
