@@ -8,6 +8,12 @@ YELLOW='\033[0;33m'
 
 total_errors=0
 
+if [[ "$1" == "-d" ]]; then
+    debug_mode=true
+else
+    debug_mode=false
+fi
+
 for file in "$test_dir"/*; do
     output=$(./build/maker "$file" 2>&1)
     total_lines=$(wc -l < "$file")
@@ -33,6 +39,11 @@ for file in "$test_dir"/*; do
         else 
             echo -e "${RED}[✖] $file $passed_lines/$total_lines ($percentage%). Number of errors $error_count "
         fi
+    fi
+    if [[ $debug_mode == true ]]; then
+        echo -e "-----------------------------\n"
+        echo "$output"
+        echo -e "-----------------------------\n"
     fi
 done
 
