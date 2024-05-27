@@ -1,0 +1,10 @@
+$(teest)
+CC=gcc
+$(CC)
+$(nett)
+all:
+	badfgh sdfadsf
+test = tt
+	bfsdf sdfadf
+clean:
+	rm -f *.c

@@ -180,7 +180,9 @@ variable:
 exportSource:
             exportSource OBJECT_NAME
             |
-            OBJECT_NAME
+            OBJECT_NAME {
+                addVariable((char*)$1);
+            }
             ;
 
 variableName:
@@ -276,7 +278,7 @@ variableValueSource:
             OBJECT_NAME { 
                 if(!checkVariable((char*)$1))
                 {
-                    char errorMsg[128] = {0};
+                    char errorMsg[512] = {0};
                     sprintf(errorMsg, "variable wasn't declareded before: %s", (char*)$1);
                     yyerror(errorMsg);
                 } 
