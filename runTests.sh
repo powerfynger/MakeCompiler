@@ -1,23 +1,35 @@
 #!/bin/bash
 
-
 test_dir="./tests"
 
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 
+total_errors=0
+
 for file in "$test_dir"/*; do
     output=$(./build/maker "$file" 2>&1)
     total_lines=$(wc -l < "$file")
 
-    if echo "$output" | grep -q "\[+\] Analysis is completed successfully."; then
-        echo -e "${GREEN}[✔] $file $total_lines/$total_lines (100.00%)"
+    error_count=$(echo "$output" | grep -c "Error")
+    total_errors=$((total_errors + error_count))
+
+    if echo "$output" | grep -q "\[+\] Analysis is completed successfully."  && [ "$error_count" -eq 0 ]; then
+        echo -e "${GREEN}[✔] $file $total_lines/$total_lines (100.00%). Number of errors $error_count"
+        # echo ""
     else
-        line_number=$(echo "$output" | grep -oP '(?<=\[Line )\d+(?=\])')
-        percentage=$(echo "scale=2; ($line_number / $total_lines) * 100" | bc)
+        line_number=$(echo "$output" | grep -oP '(?<=\[Line )\d+(?=\])' | tail -1)
+        if [ -z "$line_number" ]; then
+            line_number=0
+        fi
+        passed_lines=$((line_number - error_count))
+        if [ "$passed_lines" -lt 0 ]; then
+            passed_lines=0
+        fi
+        percentage=$(echo "scale=2; ($passed_lines / $total_lines) * 100" | bc)
         
-        echo -e "${RED}[✖] $file $line_number/$total_lines ($percentage%)"
-        # echo "$output" | grep "Line";
+        echo -e "${RED}[✖] $file $passed_lines/$total_lines ($percentage%). Number of errors $error_count "
     fi
-    # echo "-----------------------------"
 done
+
+echo -e "${RED}Total Errors: $total_errors"
