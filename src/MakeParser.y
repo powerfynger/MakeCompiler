@@ -246,7 +246,7 @@ variableSigns:
             '-' | '+' | ':' | '&' | '>' | '<' | '[' | ']' | ';' | '/' | '|'
             ;
 
-variableValue: // Было бы неплохо переписать с использованием вложенных получений значений переменных см. 4366 test1
+variableValue:
             '$' variableValueSource
             |
             '$' '$' variableValueSource // $$ Для передачи переменных в скрипты bash e.t.c.
@@ -276,7 +276,7 @@ variableValue: // Было бы неплохо переписать с испо�
 
 variableValueSource:
             OBJECT_NAME { 
-                if(!checkVariable((char*)$1))
+                if (!checkVariable((char*)$1))
                 {
                     char errorMsg[512] = {0};
                     sprintf(errorMsg, "variable wasn't declareded before: %s", (char*)$1);

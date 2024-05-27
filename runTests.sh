@@ -41,9 +41,9 @@ for file in "$test_dir"/*; do
         fi
     fi
     if [[ $debug_mode == true ]]; then
-        echo -e "-----------------------------\n"
+        echo -e "------------------------------------\n"
         echo "$output"
-        echo -e "-----------------------------\n"
+        echo -e "------------------------------------\n"
     fi
 done
 

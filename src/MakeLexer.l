@@ -96,7 +96,7 @@ OBJECT_RECIPIE ^(@[^@]*@)?\t[^\n]*
 \\[\r]?\n[ \t]*                     { ++currLine; }
 
 [ \t]                               ;
-.                                   { char errorMsg[128] = {0}; sprintf(errorMsg, "Unrecognized symbol: %c", *yytext); yyerror(errorMsg); }
+.                                   { char errorMsg[128] = {0}; sprintf(errorMsg, "unrecognized symbol: %c", *yytext); yyerror(errorMsg); }
 
 %%
 
