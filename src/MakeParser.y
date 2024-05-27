@@ -482,7 +482,7 @@ int main(int argc, char* argv[])
 
 int yyerror(const char *s)
 {  
-    fprintf(stderr, "[Line %u] Error: %s\n", yylineno, s);
+    fprintf(stderr, "[Line %u] Error: %s\n", yylineno-1, s);
     yyerrors++;
     //fprintf(stderr, "[!] Finished.\n");
     //exit(0);
