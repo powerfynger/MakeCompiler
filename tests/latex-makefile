@@ -757,7 +757,7 @@ EGREP		?= egrep
 ENV		?= env
 EXPR		?= expr
 MV		?= mv -f
-SED		?= sed
+SED ?= sed
 SORT		?= sort
 TOUCH		?= touch
 UNIQ		?= uniq
@@ -2520,7 +2520,7 @@ endef
 # BibTeX invocations
 #
 # $(call run-bibtex,<tex stem>)
-run-bibtex	= $(BIBTEX) $1 | $(color_bib); $(call transcript,bibtex,$1)
+# run-bibtex	= $(BIBTEX) $1 | $(color_bib); $(call transcript,bibtex,$1)
 
 # $(call convert-eps-to-pdf,<eps file>,<pdf file>,[gray])
 # Note that we don't use the --filter flag because it has trouble with bounding boxes that way.
