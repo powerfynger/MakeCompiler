@@ -63,7 +63,7 @@ int checkVariable(char* varName)
     int result = 0;
     for (int i = 0; i < variableSize; i++)
     {
-        if (varName == variableList[i]) 
+        if (!strcmp(varName, variableList[i])) 
         {
             result = 1;
             break;

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #define DEFAULT_TARGETS_ADD 128
 #define DEFAULT_VARS_ADD 128

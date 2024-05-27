@@ -48,7 +48,7 @@ line:
             condition
             |
             atomic ENDL {
-                yyerror("an atomic object outside the expression");
+                yyerror("an atomic object (variable, object, filename, path) outside the expression");
             }
             ;
 
@@ -276,12 +276,16 @@ variableValueSource:
                 if(!checkVariable((char*)$1))
                 {
                     char errorMsg[128] = {0};
-                    sprintf(errorMsg, "Variable wasn't declareded before: %s", (char*)$1);
+                    sprintf(errorMsg, "variable wasn't declareded before: %s", (char*)$1);
                     yyerror(errorMsg);
                 } 
             }
             |
             FILE_NAME
+            |
+            OBJECT_STR {
+                yyerror("invalid string variable name (in quotes)");
+            }
             ;
             
 substitution:
@@ -399,6 +403,10 @@ arg:
 // ---------------------- INCLUDE ------------------------
 include:
             INCLUDE filenames ENDL // Включение/исключение make-файлов в глубину
+            |
+            INCLUDE ENDL {
+                yyerror("include function has no arguments");
+            }
             ;
 
 filenames:
@@ -421,7 +429,6 @@ filename:
 // -------------------------------------------------------
 
 // -------------------------------------------------------
-
 atomics:
             atomics atomic
             |
@@ -439,8 +446,8 @@ atomic:
             |
             AUTOMATIC
             ;
-
 %%
+
 #define DEFAULT_ERROR -1
 
 int main(int argc, char* argv[])

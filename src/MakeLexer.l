@@ -24,7 +24,7 @@ OBJECT_RECIPIE ^(@[^@]*@)?\t[^\n]*
 
 \#.*                                {   } /* Комментарии */
 
-\$\$?\([@%\<?^+*][DF]?\)            { yylval.str = strdup(yytext);}
+\$\$?\([@%\<?^+*][DF]?\)            { yylval.str = strdup(yytext); }
 \$\$?[@%\<?^+*][DF]?                { yylval.str = strdup(yytext); }
 
 \n                                  { ++currLine; return ENDL; }
