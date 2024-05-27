@@ -11,7 +11,7 @@ int variableSize = 0;
 int targetCounts = 1;
 int variableCounts = 1;
 
-int currState = 0;
+int currState = STATE_NORMAL;
 
 void addTarget(char* targetName)
 {
@@ -61,6 +61,8 @@ int checkTarget(char* targetName)
 
 int checkVariable(char* varName)
 {
+    if (getState() == STATE_DEFINE) return 0;
+
     int result = 0;
     for (int i = 0; i < variableSize; i++)
     {
@@ -73,20 +75,20 @@ int checkVariable(char* varName)
     return result;    
 }
 
-void setState(int state)
-{
+void setState(enum State state) {
     currState = state;
 }
 
-int getState()
-{
+enum State getState() {
     return currState;
 }
 
-void checkState()
+void checkStateRecipe()
 {
-    if (currState == 0)
+    if (getState() != STATE_RECIPE)
+    {
         yyerror("recipie not in target");
+    }
 }
 
 void printStats()

@@ -36,15 +36,15 @@ line:
             |
             FUNC ENDL
             |
-            target { setState(1); } 
+            target { setState(STATE_RECIPE); } 
             |
-            recipies { checkState(); } 
+            recipies { checkStateRecipe(); } 
             |
-            variable { setState(0); } 
+            variable { setState(STATE_NORMAL); } 
             |
             include
             |
-            define
+            define 
             |
             condition
             |
@@ -309,11 +309,14 @@ define:
             DEFINE defineName ASSIGNMENT ENDL
             defineBody ENDL
             ENDEF ENDL
+            |
+            DEFINE defineName ASSIGNMENT ENDL
+            ENDEF ENDL
             ;
 
 defineName:
-            OBJECT_NAME { addVariable((char*)$1); }
-            | FILE_NAME { addVariable((char*)$1); }
+            OBJECT_NAME { setState(STATE_DEFINE);  addVariable((char*)$1); }
+            | FILE_NAME { setState(STATE_DEFINE); addVariable((char*)$1); }
             ;
 
 defineBody:
