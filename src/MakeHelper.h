@@ -8,6 +8,7 @@ int yyerror(const char *s);
 
 void addTarget(char* targetName);
 void addVariable(char* varName);
+int checkVariable(char* varName);
 int checkTarget(char* targetName);
 
 void setState(int state);

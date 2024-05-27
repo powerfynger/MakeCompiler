@@ -272,7 +272,14 @@ variableValue: // Было бы неплохо переписать с испо�
             ;
 
 variableValueSource:
-            OBJECT_NAME
+            OBJECT_NAME { 
+                if(!checkVariable((char*)$1))
+                {
+                    char errorMsg[128] = {0};
+                    sprintf(errorMsg, "Variable wasn't declareded before: %s", (char*)$1);
+                    yyerror(errorMsg);
+                } 
+            }
             |
             FILE_NAME
             ;
