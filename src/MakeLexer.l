@@ -19,34 +19,34 @@ CONTINUE_LINE (\\\n[ \t]*[^\n]*)*
 OBJECT_RECIPIE ^(@[^@]*@)?\t[^\n]*      
 
 %%
-{OBJECT_RECIPIE}                    { yylval.str = strdup(yytext); return OBJECT_RECIPIE; }  /* SPEC_CHAR [!@#\^&*()_+=\-`~\[\]{};'"\\\|,<>\/?] */
+{OBJECT_RECIPIE}                    { yylval.str = strdup(yytext); return OBJECT_RECIPIE; }  
 {OBJECT_RECIPIE}{CONTINUE_LINE}     { skipLines(); yylval.str = strdup(yytext); return OBJECT_RECIPIE;}
 
 
 
 \#.*       {} /* Обработка комментариев */
 
-\$\$?\([@%\<?^+*][DF]?\)            { yylval.str = strdup(yytext); /*return AUTOMATIC;*/ }
-\$\$?[@%\<?^+*][DF]?                { yylval.str = strdup(yytext); /*return AUTOMATIC;*/ }
+\$\$?\([@%\<?^+*][DF]?\)            { yylval.str = strdup(yytext);}
+\$\$?[@%\<?^+*][DF]?                { yylval.str = strdup(yytext); }
 
 \n                                  { ++currLine; return ENDL; }
 [ \t]+\n                            { ++currLine; return ENDL; }
 
 ^"vpath".*
-^"ifdef"                            { return IFDEF; } /* Обработка условных операторов */
-^"ifndef"                           { return IFNDEF; }
-^"endef"                            { return ENDEF; }
-^"ifeq"                             { return IFEQ; }
-^"ifneq"                            { return IFNEQ; }
-^"else"                             { return ELSE; }
-^"endif"                            { return ENDIF; }
+^"ifdef"                            { return IFDEF;     }
+^"ifndef"                           { return IFNDEF;    }
+^"endef"                            { return ENDEF;     }
+^"ifeq"                             { return IFEQ;      }
+^"ifneq"                            { return IFNEQ;     }
+^"else"                             { return ELSE;      }
+^"endif"                            { return ENDIF;     }
 
-^"unexport"                         { return EXPORT; }
-^"export"                           { return EXPORT; }
-"override"                         { return EXPORT; }
+^"unexport"                         { return EXPORT;    }
+^"export"                           { return EXPORT;    }
+"override"                          { return EXPORT;    }
 
-^"define"                           { return DEFINE; }
-^[\-]?"include"                          { return INCLUDE; }
+^"define"                           { return DEFINE;    }
+^[\-]?"include"                     { return INCLUDE;   }
 
 \$\$?\(("foreach"|"wildcard"|"patsubst"|"addprefix"|"subst"|"patsubst"|"strip"|"findstring") {   
                                       char* text = NULL;
@@ -91,14 +91,14 @@ OBJECT_RECIPIE ^(@[^@]*@)?\t[^\n]*
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}   { skipLines(); yylval.str = strdup(yytext); return OBJECT_NAME; } /* Обработка имён целей, файлов, путей к файлам */
 
 
-[(){}[\]$\-+"\|/&\<>`!?,:;]         { return *yytext; } /* ПУСТЬ ПОКА ТУТ ПОСТОИТ; РАНЬШЕ БЫЛА НАВЕРХУ ПОСЛЕ АВТОМАТИКОВ ПЕРЕД ЕНДЛАМИ */
+[(){}[\]$\-+"\|/&\<>`!?,:;]         { return *yytext; } 
 
 {LETTER}{DIGIT}?:\\({LETTER}|{DIGIT}|{SPEC_CHAR})+\\({LETTER}|{DIGIT}|{SPEC_CHAR})+ { yylval.str = strdup(yytext); return PATH; } /* Обработка абсолютного пути для Windows */
 
 \\[\r]?\n[ \t]*                     { ++currLine; }
 
 [ \t]                               ;
-.                                   { yyerror("Unrecognized symbol"); }
+.                                   { char errorMsg[128] = {0}; sprintf(errorMsg, "Unrecognized symbol: %c", yytext); yyerror(errorMsg); }
 
 %%
 
@@ -146,7 +146,12 @@ static void parseFunction(char **text)
                     (*text)[len++] = '\n'; 
                 }
                 else
-                    yyerror("syntax function error");                
+                {
+                    char errorMsg[128] = {0};
+                    sprintf(errorMsg, "Unexpcted symbol, at the end of line: %c", prev);
+                    yyerror(errorMsg);                
+
+                }
                 break;
             }
             default:
@@ -163,7 +168,6 @@ static void parseFunction(char **text)
 static void skipLines() 
 {
     int line = currLine;
-    // printf("Line: %d\n", line);
 
     char *p = yytext + strlen(yytext) - 1;
     while (p >= yytext && *p == '\n') {
@@ -176,7 +180,6 @@ static void skipLines()
         line++;
         p--;
     }
-    // printf("Line: %d\nChar: %s", line, p);
     currLine = line;
 }
 
