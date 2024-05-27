@@ -44,7 +44,7 @@ line:
             |
             include
             |
-            define 
+            define
             |
             condition
             |
@@ -304,18 +304,21 @@ substitution:
 define:
             DEFINE defineName ENDL
             defineBody ENDL
-            ENDEF ENDL
+            endefine
             |
             DEFINE defineName ASSIGNMENT ENDL
             defineBody ENDL
-            ENDEF ENDL
-            |
-            DEFINE defineName ASSIGNMENT ENDL
-            ENDEF ENDL
+            endefine
+            ;
+
+endefine:
+            ENDEF ENDL {
+                setState(STATE_NORMAL);
+            }
             ;
 
 defineName:
-            OBJECT_NAME { setState(STATE_DEFINE);  addVariable((char*)$1); }
+            OBJECT_NAME { setState(STATE_DEFINE); addVariable((char*)$1); }
             | FILE_NAME { setState(STATE_DEFINE); addVariable((char*)$1); }
             ;
 

@@ -61,7 +61,7 @@ int checkTarget(char* targetName)
 
 int checkVariable(char* varName)
 {
-    if (getState() == STATE_DEFINE) return 0;
+    if (getState() == STATE_DEFINE) return 1;
 
     int result = 0;
     for (int i = 0; i < variableSize; i++)
