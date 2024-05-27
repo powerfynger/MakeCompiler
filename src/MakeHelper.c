@@ -24,7 +24,6 @@ void addTarget(char* targetName)
     if (!checkTarget(targetName)) 
     {
         targetList[targetSize] = targetName;
-        //printf("New target: %s\n", targetList[targetSize]);
         targetSize++;
     }
 }
@@ -41,7 +40,6 @@ void addVariable(char* varName)
     if (!checkTarget(varName)) 
     {
         variableList[variableSize] = varName;
-        //printf("New var: %s\n", variableList[variableSize]);
         variableSize++;
     }
 }

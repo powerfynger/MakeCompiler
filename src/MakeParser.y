@@ -341,6 +341,10 @@ defineSigns:
 condition:
             if '(' args ',' args ')' ENDL
             |
+            if '(' args ',' args ENDL {
+                yyerror("the closing \')\' is missing");
+            }
+            |
             if '(' args ',' ')' ENDL
             |
             if '(' ',' args ')' ENDL

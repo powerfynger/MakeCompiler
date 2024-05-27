@@ -71,3 +71,10 @@ test-1.2:
 	@docker run composer/composer:1.2-php5 --version --no-ansi
 	@echo -n "1.2-php5-alpine\t\t"
 	@docker run composer/composer:1.2-php5-alpine --version --no-ansi
+
+builddd:
+	echo shaman
+	echo shaman 123
+vars = 123
+	echo one two free
+

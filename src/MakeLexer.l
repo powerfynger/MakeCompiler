@@ -22,9 +22,7 @@ OBJECT_RECIPIE ^(@[^@]*@)?\t[^\n]*
 {OBJECT_RECIPIE}                    { yylval.str = strdup(yytext); return OBJECT_RECIPIE; }  
 {OBJECT_RECIPIE}{CONTINUE_LINE}     { skipLines(); yylval.str = strdup(yytext); return OBJECT_RECIPIE;}
 
-
-
-\#.*       {} /* Обработка комментариев */
+\#.*                                {   } /* Комментарии */
 
 \$\$?\([@%\<?^+*][DF]?\)            { yylval.str = strdup(yytext);}
 \$\$?[@%\<?^+*][DF]?                { yylval.str = strdup(yytext); }
@@ -86,7 +84,7 @@ OBJECT_RECIPIE ^(@[^@]*@)?\t[^\n]*
 
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+"."({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}  { skipLines(); yylval.str = strdup(yytext); return FILE_NAME; }
 
-\@({LETTER}|{DIGIT}|{SPEC_CHAR})+\@{CONTINUE_LINE}   {  } /* Обработка имён целей, файлов, путей к файлам */
+\@({LETTER}|{DIGIT}|{SPEC_CHAR})+\@{CONTINUE_LINE}   {   } /* Обработка имён целей, файлов, путей к файлам */
 
 ({LETTER}|{DIGIT}|{SPEC_CHAR})+{CONTINUE_LINE}   { skipLines(); yylval.str = strdup(yytext); return OBJECT_NAME; } /* Обработка имён целей, файлов, путей к файлам */
 
@@ -98,7 +96,7 @@ OBJECT_RECIPIE ^(@[^@]*@)?\t[^\n]*
 \\[\r]?\n[ \t]*                     { ++currLine; }
 
 [ \t]                               ;
-.                                   { char errorMsg[128] = {0}; sprintf(errorMsg, "Unrecognized symbol: %c", yytext); yyerror(errorMsg); }
+.                                   { char errorMsg[128] = {0}; sprintf(errorMsg, "Unrecognized symbol: %c", *yytext); yyerror(errorMsg); }
 
 %%
 
@@ -148,9 +146,8 @@ static void parseFunction(char **text)
                 else
                 {
                     char errorMsg[128] = {0};
-                    sprintf(errorMsg, "Unexpcted symbol, at the end of line: %c", prev);
-                    yyerror(errorMsg);                
-
+                    sprintf(errorMsg, "Unexpected symbol, at the end of line: %c", prev);
+                    yyerror(errorMsg);
                 }
                 break;
             }
